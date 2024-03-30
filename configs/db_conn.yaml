@@ -1,0 +1,24 @@
+admin:
+  url: "127.0.0.1"
+  port: "5432"
+  user: "smidgen_admin"
+  password: "admin"
+  database: "smidgen"
+read:
+  url: "127.0.0.1"
+  port: "5432"
+  user: "smidgen_readonly"
+  password: "read"
+  database: "smidgen"
+write:
+  url: "127.0.0.1"
+  port: "5432"
+  user: "smidgen_writeonly"
+  password: "write"
+  database: "smidgen"
+delete:
+  url: "127.0.0.1"
+  port: "5432"
+  user: "smidgen_deleteonly"
+  password: "delete"
+  database: "smidgen"

@@ -1,0 +1,986 @@
+openapi: 3.0.0
+info:
+  contact:
+    email: contact@josehernandez.dev
+    name: Smidgen
+    url: https://example.com/
+  description: API for interacting with Smidgen.
+  license:
+    name: " GNU AFFERO GENERAL PUBLIC LICENSE Version 3, 19 November 2007"
+    url: https://www.gnu.org/licenses/agpl-3.0.en.html
+  title: Smidgen
+  version: 0.0.1
+servers:
+- url: /api/v1
+paths:
+  /user/:
+    get:
+      description: Get all Users stored in the database.
+      operationId: get_user_user__get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/user'
+                title: Response Get User User  Get
+                type: array
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+      summary: Get Users
+      tags:
+      - user
+    post:
+      description: Create a new user in the database.
+      operationId: add_user_user__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create user
+      tags:
+      - user
+  /user/{user_id}:
+    delete:
+      description: Delete the specified user from the database.
+      operationId: delete_user_user__user_id__delete
+      parameters:
+      - explode: false
+        in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+        style: simple
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete user
+      tags:
+      - user
+    get:
+      description: Get the specified user stored in the database.
+      operationId: get_User_user__user_id__get
+      parameters:
+      - explode: false
+        in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get user
+      tags:
+      - user
+    put:
+      description: Update the specified user in the database.
+      operationId: update_user_user__user_id__put
+      parameters:
+      - explode: false
+        in: path
+        name: user_id
+        required: true
+        schema:
+          title: User Id
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update user
+      tags:
+      - user
+  /equipment/:
+    get:
+      description: Get all equipments stored in the database.
+      operationId: get_equipment_equipment__get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/equipment'
+                title: Response Get Equipment Equipment  Get
+                type: array
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+      summary: Get equipments
+      tags:
+      - equipment
+    post:
+      description: Create a new equipment in the database.
+      operationId: add_equipment_equipment__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/equipment'
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create equipment
+      tags:
+      - equipment
+  /equipment/{equipment_id}:
+    delete:
+      description: Delete the specified equipment from the database.
+      operationId: delete_equipment_equipment__equipment_id__delete
+      parameters:
+      - explode: false
+        in: path
+        name: equipment_id
+        required: true
+        schema:
+          title: Equipment Id
+          type: integer
+        style: simple
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete equipment
+      tags:
+      - equipment
+    get:
+      description: Get the specified equipment stored in the database.
+      operationId: get_equipments_equipment__equipment_id__get
+      parameters:
+      - explode: false
+        in: path
+        name: equipment_id
+        required: true
+        schema:
+          title: Equipment Id
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/equipment'
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get equipment
+      tags:
+      - equipment
+    put:
+      description: Update the specified equipment in the database.
+      operationId: update_equipment_equipment__equipment_id__put
+      parameters:
+      - explode: false
+        in: path
+        name: equipment_id
+        required: true
+        schema:
+          title: Equipment Id
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/equipment'
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update equipment
+      tags:
+      - equipment
+  /equipment_assignment/:
+    get:
+      description: Get all assignments stored in the database.
+      operationId: get_assignment_equipment_assignment__get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/equipment_assignment'
+                title: Response Get Assignment Equipment Assignment  Get
+                type: array
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+      summary: Get assignments
+      tags:
+      - equipment assignment
+    post:
+      description: Create a new assignment in the database.
+      operationId: add_assignment_equipment_assignment__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/equipment_assignment'
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create assignment
+      tags:
+      - equipment assignment
+  /equipment_assignment/{assignment_id}:
+    delete:
+      description: Delete the specified assignment from the database.
+      operationId: delete_assignment_equipment_assignment__assignment_id__delete
+      parameters:
+      - explode: false
+        in: path
+        name: assignment_id
+        required: true
+        schema:
+          title: Assignment Id
+          type: integer
+        style: simple
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete assignment
+      tags:
+      - equipment assignment
+    get:
+      description: Get the specified assignment stored in the database.
+      operationId: get_assignments_equipment_assignment__assignment_id__get
+      parameters:
+      - explode: false
+        in: path
+        name: assignment_id
+        required: true
+        schema:
+          title: Assignment Id
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/equipment_assignment'
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get assignment
+      tags:
+      - equipment assignment
+    put:
+      description: Update the specified assignment in the database.
+      operationId: update_assignment_equipment_assignment__assignment_id__put
+      parameters:
+      - explode: false
+        in: path
+        name: assignment_id
+        required: true
+        schema:
+          title: Assignment Id
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/equipment_assignment'
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update assignment
+      tags:
+      - equipment assignment
+  /business_unit/:
+    get:
+      description: Get all business units stored in the database.
+      operationId: get_unit_business_unit__get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/business_unit'
+                title: Response Get Unit Business Unit  Get
+                type: array
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+      summary: Get Business Units
+      tags:
+      - business unit
+    post:
+      description: Create a new business unit in the database.
+      operationId: add_unit_business_unit__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/business_unit'
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Create Business Unit
+      tags:
+      - business unit
+  /business_unit/{unit_id}:
+    delete:
+      description: Delete the specified business unit from the database.
+      operationId: delete_unit_business_unit__unit_id__delete
+      parameters:
+      - explode: false
+        in: path
+        name: unit_id
+        required: true
+        schema:
+          title: Unit Id
+          type: integer
+        style: simple
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Delete Business Unit
+      tags:
+      - business unit
+    get:
+      description: Get the specified business unit stored in the database.
+      operationId: get_units_business_unit__unit_id__get
+      parameters:
+      - explode: false
+        in: path
+        name: unit_id
+        required: true
+        schema:
+          title: Unit Id
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/business_unit'
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Get Business Unit
+      tags:
+      - business unit
+    put:
+      description: Update the specified business unit in the database.
+      operationId: update_unit_business_unit__unit_id__put
+      parameters:
+      - explode: false
+        in: path
+        name: unit_id
+        required: true
+        schema:
+          title: Unit Id
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/business_unit'
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema: {}
+          description: The data received was accepted and is quered for addition to
+            the database.
+        "200":
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+          description: Validation Error
+      summary: Update Business Unit
+      tags:
+      - business unit
+  /:
+    get:
+      operationId: root__get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+      summary: Root
+  /healthcheck:
+    get:
+      operationId: check_healthcheck_get
+      responses:
+        "200":
+          content:
+            application/json:
+              schema: {}
+          description: The data was found and has been returned.
+        "404":
+          description: The data requested was not found in the database.
+        "401":
+          description: You are unauthorized to view this resource.
+        "403":
+          description: Access to this page is forbidden. Please reference the API
+            documentation for more information.
+        "500":
+          description: An unexpected error has occured.
+        "501":
+          description: This resource has not been implemented yet.
+      summary: Check
+components:
+  schemas:
+    HTTPValidationError:
+      example:
+        detail:
+        - msg: msg
+          loc:
+          - Location_inner
+          - Location_inner
+          type: type
+        - msg: msg
+          loc:
+          - Location_inner
+          - Location_inner
+          type: type
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          title: Detail
+          type: array
+      title: HTTPValidationError
+      type: object
+    ValidationError:
+      example:
+        msg: msg
+        loc:
+        - Location_inner
+        - Location_inner
+        type: type
+      properties:
+        loc:
+          items:
+            $ref: '#/components/schemas/Location_inner'
+          title: Location
+          type: array
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
+          type: string
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+      type: object
+    business_unit:
+      example:
+        country: country
+        city: city
+        address_line_two: address_line_two
+        name: name
+        state: state
+        address_line_one: address_line_one
+        unit_id: 0
+        point_of_contact: point_of_contact
+      properties:
+        unit_id:
+          title: Unit Id
+          type: integer
+        name:
+          title: Name
+          type: string
+        point_of_contact:
+          title: Point Of Contact
+          type: string
+        address_line_one:
+          title: Address Line One
+          type: string
+        address_line_two:
+          title: Address Line Two
+          type: string
+        state:
+          title: State
+          type: string
+        city:
+          title: City
+          type: string
+        country:
+          title: Country
+          type: string
+      required:
+      - address_line_one
+      - address_line_two
+      - city
+      - country
+      - name
+      - point_of_contact
+      - state
+      - unit_id
+      title: business_unit
+      type: object
+    equipment:
+      example:
+        business_unit_id: 6
+        description: description
+        model: model
+        last_inventoried: 2000-01-23T04:56:07.000+00:00
+        date_received: 2000-01-23T04:56:07.000+00:00
+        equipment_id: 0
+        manufacturer: manufacturer
+      properties:
+        equipment_id:
+          title: Equipment Id
+          type: integer
+        business_unit_id:
+          title: Business Unit Id
+          type: integer
+        manufacturer:
+          title: Manufacturer
+          type: string
+        model:
+          title: Model
+          type: string
+        description:
+          title: Description
+          type: string
+        date_received:
+          format: date-time
+          title: Date Received
+          type: string
+        last_inventoried:
+          format: date-time
+          title: Last Inventoried
+          type: string
+      required:
+      - business_unit_id
+      - date_received
+      - description
+      - equipment_id
+      - last_inventoried
+      - manufacturer
+      - model
+      title: equipment
+      type: object
+    equipment_assignment:
+      example:
+        assignment_id: 0
+        user_id: 6
+        date_of_assignment: 2000-01-23T04:56:07.000+00:00
+        equipment_id: 1
+      properties:
+        assignment_id:
+          title: Assignment Id
+          type: integer
+        user_id:
+          title: User Id
+          type: integer
+        equipment_id:
+          title: Equipment Id
+          type: integer
+        date_of_assignment:
+          format: date-time
+          title: Date Of Assignment
+          type: string
+      required:
+      - assignment_id
+      - date_of_assignment
+      - equipment_id
+      - user_id
+      title: equipment_assignment
+      type: object
+    user:
+      example:
+        business_unit_id: 6
+        user_id: 0
+        email: email
+        username: username
+      properties:
+        user_id:
+          title: User Id
+          type: integer
+        business_unit_id:
+          title: Business Unit Id
+          type: integer
+        username:
+          title: Username
+          type: string
+        email:
+          title: Email
+          type: string
+      required:
+      - business_unit_id
+      - email
+      - user_id
+      - username
+      title: user
+      type: object
+    Location_inner:
+      anyOf:
+      - type: string
+      - type: integer

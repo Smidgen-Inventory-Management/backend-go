@@ -1,0 +1,5 @@
+Development:
+  host: "127.0.0.1"
+  port: "8050"
+  debug: True
+  root_path: "/api/v1"
