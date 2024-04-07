@@ -15,26 +15,18 @@ import (
 )
 
 type BusinessUnit struct {
-	UnitId int32 `json:"unit_id"`
-
-	Name string `json:"name"`
-
+	UnitId         int32  `json:"unit_id"`
+	Name           string `json:"name"`
 	PointOfContact string `json:"point_of_contact"`
-
 	AddressLineOne string `json:"address_line_one"`
-
 	AddressLineTwo string `json:"address_line_two"`
-
-	State string `json:"state"`
-
-	City string `json:"city"`
-
-	Country string `json:"country"`
+	State          string `json:"state"`
+	City           string `json:"city"`
+	Country        string `json:"country"`
 }
 
 func AssertBusinessUnitRequired(obj BusinessUnit) error {
 	elements := map[string]interface{}{
-		"unit_id":          obj.UnitId,
 		"name":             obj.Name,
 		"point_of_contact": obj.PointOfContact,
 		"address_line_one": obj.AddressLineOne,

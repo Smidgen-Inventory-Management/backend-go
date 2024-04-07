@@ -1,8 +1,12 @@
 package smidgen
 
 import (
+	"database/sql"
 	"fmt"
 	"reflect"
+	"strings"
+
+	"github.com/lib/pq"
 )
 
 // GetRows operates by using an instance of DatabaseConnection.
@@ -43,4 +47,167 @@ func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]in
 	}
 
 	return results, nil
+}
+
+func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32, dest interface{}) (interface{}, error) {
+	query := fmt.Sprintf("SELECT * FROM smidgen.%s WHERE %s=%d", tableName, idName, id)
+
+	rows, err := dao.db.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("\nfailed to query rows from table smidgen.%s: %v", tableName, err)
+	}
+	defer rows.Close()
+
+	objectType := reflect.TypeOf(dest).Elem()
+
+	destValues := make([]interface{}, 0)
+	for i := 0; i < objectType.NumField(); i++ {
+		destValues = append(destValues, reflect.New(objectType.Field(i).Type).Interface())
+	}
+
+	if !rows.Next() {
+		return nil, fmt.Errorf("no rows returned by the query")
+	}
+
+	if err := rows.Scan(destValues...); err != nil {
+		return nil, fmt.Errorf("\nfailed to scan rows from table smidgen.%s: %v", tableName, err)
+	}
+
+	result := reflect.New(objectType).Elem()
+	for i := 0; i < objectType.NumField(); i++ {
+		result.Field(i).Set(reflect.Indirect(reflect.ValueOf(destValues[i])))
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("\nerror while iterating over rows from table smidgen.%s: %v", tableName, err)
+	}
+
+	return result.Interface(), nil
+}
+
+func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) error {
+	v := reflect.ValueOf(values)
+	primaryID := v.Type().Field(0).Name
+
+	tx, err := dao.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	var lastInsertedID int
+	var columns []string
+	var placeholders []string
+
+	if err := tx.QueryRow("SELECT COALESCE(MAX(" + primaryID + "), 0) FROM smidgen." + tableName).Scan(&lastInsertedID); err != nil && err != sql.ErrNoRows {
+		return err
+	}
+
+	newID := lastInsertedID + 1
+
+	columns = append(columns, primaryID)
+	placeholders = append(placeholders, "$1")
+	for i := 1; i < v.NumField(); i++ {
+		columns = append(columns, v.Type().Field(i).Name)
+		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
+	}
+
+	query := fmt.Sprintf("INSERT INTO smidgen.%s (%s) VALUES (%s)", tableName, strings.Join(columns, ", "), strings.Join(placeholders, ", "))
+
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	fieldValues := make([]interface{}, v.NumField())
+	fieldValues[0] = newID
+	for i := 1; i < v.NumField(); i++ {
+		fieldValues[i] = v.Field(i).Interface()
+	}
+
+	_, err = stmt.Exec(fieldValues...)
+	if err != nil {
+		if pqErr, ok := err.(*pq.Error); ok {
+			if pqErr.Code == "23503" {
+				return fmt.Errorf("23503")
+			}
+		}
+	}
+
+	return tx.Commit()
+}
+
+func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id int32, args ...interface{}) error {
+	tx, err := dao.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	query := fmt.Sprintf("DELETE FROM smidgen.%s WHERE %s=%v", tableName, idLabel, id)
+
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(args...)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id int32, values interface{}) error {
+	v := reflect.ValueOf(values)
+	objectType := v.Type()
+
+	var setValues []string
+	for i := 1; i < v.NumField(); i++ { // Start from index 1 to exclude the first column
+		fieldName := objectType.Field(i).Name
+		setValues = append(setValues, fmt.Sprintf("%s=$%d", fieldName, i))
+	}
+
+	setClause := strings.Join(setValues, ", ")
+
+	query := fmt.Sprintf("UPDATE smidgen.%s SET %s WHERE %s=%v", tableName, setClause, idLabel, id)
+
+	tx, err := dao.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	var fieldValues []interface{}
+	for i := 1; i < v.NumField(); i++ { // Start from index 1 to exclude the first column
+		fieldValues = append(fieldValues, v.Field(i).Interface())
+	}
+
+	_, err = stmt.Exec(fieldValues...)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
 }

@@ -20,13 +20,12 @@ type User struct {
 	BusinessUnitId int32          `json:"business_unit_id"`
 	Username       string         `json:"username"`
 	Email          string         `json:"email"`
-	SaltedEmail    sql.NullString `json:"salted_password"`
+	SaltedPassword sql.NullString `json:"salted_password"`
 }
 
 // AssertUserRequired checks if the required fields are not zero-ed
 func AssertUserRequired(obj User) error {
 	elements := map[string]interface{}{
-		"user_id":          obj.UserId,
 		"business_unit_id": obj.BusinessUnitId,
 		"username":         obj.Username,
 		"email":            obj.Email,

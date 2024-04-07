@@ -18,7 +18,7 @@ import (
 	"os"
 
 	api "smidgen-backend/go/api"
-	service "smidgen-backend/go/api/services"
+	service "smidgen-backend/go/services"
 	models "smidgen-backend/go/models"
 	utils "smidgen-backend/go/utils"
 
@@ -37,12 +37,12 @@ func main() {
 		log.Fatalf("Failed to load server config: %v", err)
 	}
 
-	developmentConfig, ok := serverConfig.Environments["Development"]
+	environmentConfig, ok := serverConfig.Environments["Development"]
 	if !ok {
-		log.Fatal("Development environment configuration not found")
+		log.Fatal("Environment configuration not found")
 	}
 
-	hostname := developmentConfig.Host + ":" + developmentConfig.Port
+	hostname := environmentConfig.Host + ":" + environmentConfig.Port
 	log.Printf("Server starting on %s", hostname)
 
 	BusinessUnitAPIService := service.NewBusinessUnitAPIService()
@@ -60,7 +60,7 @@ func main() {
 	UserAPIService := service.NewUserAPIService()
 	UserAPIController := api.NewUserAPIController(UserAPIService)
 
-	router := utils.NewRouter(developmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController)
+	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController)
 
 	err = http.ListenAndServe(hostname, router)
 	if err != nil {
