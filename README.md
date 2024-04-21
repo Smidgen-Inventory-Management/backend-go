@@ -201,7 +201,7 @@ Project Link: [https://github.com/Smidgen-Inventory-Management/backend-go](https
 [issues-url]: https://github.com/Smidgen-Inventory-Management/backend-go/issues
 
 [license-shield]: https://img.shields.io/github/license/Smidgen-Inventory-Management/backend-go.svg?style=for-the-badge
-[license-url]: https://github.com/Smidgen-Inventory-Management/backend-go/blob/master/LICENSE.txt
+[license-url]: https://github.com/Smidgen-Inventory-Management/backend-go/blob/main/LICENSE.txt
 
 [product-screenshot]: images/screenshot.png
 
