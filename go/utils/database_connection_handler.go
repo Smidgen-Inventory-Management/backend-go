@@ -1,10 +1,34 @@
+/*
+ * Smidgen
+ *
+ * API for interacting with Smidgen.
+ *
+ *   Smidgen aims to simplify and automate common tasks that logisticians
+ *   conduct on a daily basis so they can focus on the effective distribution
+ *   of materiel, as well as maintain an accurate record keeping book of
+ *   receiving, issuance, audits, surpluses, amongst other logistical tasks.
+ *   Copyright (C) 2024  Jose Hernandez
+ *
+ *   This program is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package smidgen
 
 import (
 	"database/sql"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"reflect"
 	"strings"
@@ -35,18 +59,14 @@ type databaseCredentials struct {
 	Database string `yaml:"database"`
 }
 
-var (
-	instance *DatabaseConnection
-	once     sync.Once
-)
+var log = Log()
 
 func NewDatabaseConnection(privilege string) (*DatabaseConnection, error) {
-	once.Do(func() {
-		instance = &DatabaseConnection{privilege: privilege}
-		if err := instance.initialize(privilege); err != nil {
-			log.Fatalf("Failed to initialize database connection: %v", err)
-		}
-	})
+	instance := &DatabaseConnection{privilege: privilege}
+	initErr := instance.initialize(privilege)
+	if initErr != nil {
+		return nil, fmt.Errorf("failed to initialize database connection: %v", initErr)
+	}
 	return instance, nil
 }
 
@@ -67,11 +87,13 @@ func (dao *DatabaseConnection) initialize(privilege string) error {
 	if err := yaml.Unmarshal(yamlData, &config); err != nil {
 		return fmt.Errorf("\nfailed to unmarshal YAML: %v", err)
 	}
+	log.Info("Successfully loaded database configurations.")
 
 	field := reflect.ValueOf(&config).Elem().FieldByName(strings.ToUpper(privilege[:1]) + privilege[1:])
 	if !field.IsValid() {
 		return fmt.Errorf("\ninvalid privilege level")
 	}
+	log.Info("Successfully loaded %v connection configurations.", privilege)
 	connectionConfig := field.Interface().(databaseCredentials)
 
 	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
@@ -98,4 +120,8 @@ func (dao *DatabaseConnection) Close() error {
 		dao.db = nil
 	}
 	return nil
+}
+
+func (dao *DatabaseConnection) Ping() error {
+	return dao.db.Ping()
 }
