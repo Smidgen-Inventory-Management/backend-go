@@ -108,6 +108,11 @@ To get a local copy of the backend server up and running follow these simple exa
 
 3.  Modify your server configs in `configs/`
 
+4.  Run the server by executing:
+    ```sh
+    go run main.go ./configs/server.yaml ./configs/db_conn.yaml
+    ```
+    4.1.  First ensure that the database is running, otherwise the server will fail to start.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
