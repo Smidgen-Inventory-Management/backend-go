@@ -68,41 +68,36 @@ func NewUserAPIController(s UserAPIServicer, opts ...UserAPIOption) utils.Router
 // utils.Routes returns all the api utils.routes for the UserAPIController
 func (c *UserAPIController) Routes() utils.Routes {
 	return utils.Routes{
-		"AddUserUserPost": utils.Route{
+		"AddUser": utils.Route{
 			Method:      strings.ToUpper("Post"),
 			Pattern:     "user",
-			HandlerFunc: c.AddUserUserPost,
+			HandlerFunc: c.AddUser,
 		},
-		"DeleteUserUserUserIdDelete": utils.Route{
+		"DeleteUser": utils.Route{
 			Method:      strings.ToUpper("Delete"),
 			Pattern:     "user/{user_id}",
-			HandlerFunc: c.DeleteUserUserUserIdDelete,
+			HandlerFunc: c.DeleteUser,
 		},
-		"GetUserUserGet": utils.Route{
+		"GetUser": utils.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "user/",
-			HandlerFunc: c.GetUserUserGet,
+			HandlerFunc: c.GetUser,
 		},
-		"GetUserAssignmentIdGetAssignments": utils.Route{
-			Method:      strings.ToUpper("Get"),
-			Pattern:     "user/{user_id}/assignments",
-			HandlerFunc: c.GetUserAssignmentIdGetAssignments,
-		},
-		"GetUserUserUserIdGet": utils.Route{
+		"GetUserById": utils.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "user/{user_id}",
-			HandlerFunc: c.GetUserUserUserIdGet,
+			HandlerFunc: c.GetUserById,
 		},
-		"UpdateUserUserUserIdPut": utils.Route{
+		"UpdateUser": utils.Route{
 			Method:      strings.ToUpper("Put"),
 			Pattern:     "user/{user_id}",
-			HandlerFunc: c.UpdateUserUserUserIdPut,
+			HandlerFunc: c.UpdateUser,
 		},
 	}
 }
 
-// AddUserUserPost - Create user
-func (c *UserAPIController) AddUserUserPost(w http.ResponseWriter, r *http.Request) {
+// AddUser - Create user
+func (c *UserAPIController) AddUser(w http.ResponseWriter, r *http.Request) {
 	userParam := models.User{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -118,7 +113,7 @@ func (c *UserAPIController) AddUserUserPost(w http.ResponseWriter, r *http.Reque
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.AddUserUserPost(r.Context(), userParam)
+	result, err := c.service.AddUser(r.Context(), userParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -128,8 +123,8 @@ func (c *UserAPIController) AddUserUserPost(w http.ResponseWriter, r *http.Reque
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// DeleteUserUserUserIdDelete - Delete user
-func (c *UserAPIController) DeleteUserUserUserIdDelete(w http.ResponseWriter, r *http.Request) {
+// DeleteUser - Delete user
+func (c *UserAPIController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userIdParam, err := utils.ParseNumericParameter[int32](
 		params["user_id"],
@@ -139,7 +134,7 @@ func (c *UserAPIController) DeleteUserUserUserIdDelete(w http.ResponseWriter, r 
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.DeleteUserUserUserIdDelete(r.Context(), userIdParam)
+	result, err := c.service.DeleteUser(r.Context(), userIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -149,9 +144,9 @@ func (c *UserAPIController) DeleteUserUserUserIdDelete(w http.ResponseWriter, r 
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetUserUserGet - Get Users
-func (c *UserAPIController) GetUserUserGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetUserUserGet(r.Context())
+// GetUser - Get Users
+func (c *UserAPIController) GetUser(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetUser(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -161,8 +156,8 @@ func (c *UserAPIController) GetUserUserGet(w http.ResponseWriter, r *http.Reques
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetUserUserUserIdGet - Get user
-func (c *UserAPIController) GetUserUserUserIdGet(w http.ResponseWriter, r *http.Request) {
+// GetUserById - Get user
+func (c *UserAPIController) GetUserById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userIdParam, err := utils.ParseNumericParameter[int32](
 		params["user_id"],
@@ -172,7 +167,7 @@ func (c *UserAPIController) GetUserUserUserIdGet(w http.ResponseWriter, r *http.
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetUserUserUserIdGet(r.Context(), userIdParam)
+	result, err := c.service.GetUserById(r.Context(), userIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -182,29 +177,8 @@ func (c *UserAPIController) GetUserUserUserIdGet(w http.ResponseWriter, r *http.
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetUserAssignmentIdGetAssignments - Get user assignments
-func (c *UserAPIController) GetUserAssignmentIdGetAssignments(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	userIdParam, err := utils.ParseNumericParameter[int32](
-		params["user_id"],
-		utils.WithRequire[int32](utils.ParseInt32),
-	)
-	if err != nil {
-		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
-		return
-	}
-	result, err := c.service.GetUserUserUserIdGet(r.Context(), userIdParam)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		c.errorHandler(w, r, err, &result)
-		return
-	}
-	// If no error, encode the body and the result code
-	utils.EncodeJSONResponse(result.Body, &result.Code, w)
-}
-
-// UpdateUserUserUserIdPut - Update user
-func (c *UserAPIController) UpdateUserUserUserIdPut(w http.ResponseWriter, r *http.Request) {
+// UpdateUser - Update user
+func (c *UserAPIController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	userIdParam, err := utils.ParseNumericParameter[int32](
 		params["user_id"],
@@ -229,7 +203,7 @@ func (c *UserAPIController) UpdateUserUserUserIdPut(w http.ResponseWriter, r *ht
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateUserUserUserIdPut(r.Context(), userIdParam, userParam)
+	result, err := c.service.UpdateUser(r.Context(), userIdParam, userParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -38,6 +38,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var log = Log()
+
 type DatabaseConnection struct {
 	db        *sql.DB
 	privilege string
@@ -58,8 +60,6 @@ type databaseCredentials struct {
 	Password string `yaml:"password"`
 	Database string `yaml:"database"`
 }
-
-var log = Log()
 
 func NewDatabaseConnection(privilege string) (*DatabaseConnection, error) {
 	instance := &DatabaseConnection{privilege: privilege}

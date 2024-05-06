@@ -46,8 +46,8 @@ func NewEquipmentAssignmentAPIService() api.EquipmentAssignmentAPIServicer {
 	return &EquipmentAssignmentAPIService{}
 }
 
-// AddAssignmentEquipmentAssignmentPost - Create assignment
-func (s *EquipmentAssignmentAPIService) AddAssignmentEquipmentAssignmentPost(ctx context.Context, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
+// AddEquipmentAssignment - Create assignment
+func (s *EquipmentAssignmentAPIService) AddEquipmentAssignment(ctx context.Context, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -62,8 +62,8 @@ func (s *EquipmentAssignmentAPIService) AddAssignmentEquipmentAssignmentPost(ctx
 	return utils.Response(202, nil), nil
 }
 
-// DeleteAssignmentEquipmentAssignmentAssignmentIdDelete - Delete assignment
-func (s *EquipmentAssignmentAPIService) DeleteAssignmentEquipmentAssignmentAssignmentIdDelete(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
+// DeleteEquipmentAssignment - Delete assignment
+func (s *EquipmentAssignmentAPIService) DeleteEquipmentAssignment(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -79,8 +79,8 @@ func (s *EquipmentAssignmentAPIService) DeleteAssignmentEquipmentAssignmentAssig
 	return utils.Response(200, nil), nil
 }
 
-// GetAssignmentEquipmentAssignmentGet - Get assignments
-func (s *EquipmentAssignmentAPIService) GetAssignmentEquipmentAssignmentGet(ctx context.Context) (utils.ImplResponse, error) {
+// GetEquipmentAssignment - Get assignments
+func (s *EquipmentAssignmentAPIService) GetEquipmentAssignment(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
@@ -108,8 +108,8 @@ func (s *EquipmentAssignmentAPIService) GetAssignmentEquipmentAssignmentGet(ctx 
 	return utils.Response(200, Assignments), nil
 }
 
-// GetAssignmentsEquipmentAssignmentAssignmentIdGet - Get assignment
-func (s *EquipmentAssignmentAPIService) GetAssignmentsEquipmentAssignmentAssignmentIdGet(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
+// GetEquipmnentAssignmentById - Get assignment
+func (s *EquipmentAssignmentAPIService) GetEquipmentAssignmentById(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -131,8 +131,8 @@ func (s *EquipmentAssignmentAPIService) GetAssignmentsEquipmentAssignmentAssignm
 	return utils.Response(200, assignment), nil
 }
 
-// UpdateAssignmentEquipmentAssignmentAssignmentIdPut - Update assignment
-func (s *EquipmentAssignmentAPIService) UpdateAssignmentEquipmentAssignmentAssignmentIdPut(ctx context.Context, assignmentId int32, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
+// UpdateEquipmentAssignment - Update assignment
+func (s *EquipmentAssignmentAPIService) UpdateEquipmentAssignment(ctx context.Context, assignmentId int32, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {

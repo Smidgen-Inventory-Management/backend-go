@@ -68,36 +68,36 @@ func NewEquipmentAssignmentAPIController(s EquipmentAssignmentAPIServicer, opts 
 // Routes returns all the api routes for the EquipmentAssignmentAPIController
 func (c *EquipmentAssignmentAPIController) Routes() utils.Routes {
 	return utils.Routes{
-		"AddAssignmentEquipmentAssignmentPost": utils.Route{
+		"AddEquipmentAssignment": utils.Route{
 			Method:      strings.ToUpper("Post"),
 			Pattern:     "equipment_assignment/",
-			HandlerFunc: c.AddAssignmentEquipmentAssignmentPost,
+			HandlerFunc: c.AddEquipmentAssignment,
 		},
-		"DeleteAssignmentEquipmentAssignmentAssignmentIdDelete": utils.Route{
+		"DeleteEquipmentAssignment": utils.Route{
 			Method:      strings.ToUpper("Delete"),
 			Pattern:     "equipment_assignment/{assignment_id}",
-			HandlerFunc: c.DeleteAssignmentEquipmentAssignmentAssignmentIdDelete,
+			HandlerFunc: c.DeleteEquipmentAssignment,
 		},
-		"GetAssignmentEquipmentAssignmentGet": utils.Route{
+		"GetEquipmentAssignment": utils.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "equipment_assignment/",
-			HandlerFunc: c.GetAssignmentEquipmentAssignmentGet,
+			HandlerFunc: c.GetEquipmentAssignment,
 		},
-		"GetAssignmentsEquipmentAssignmentAssignmentIdGet": utils.Route{
+		"GetEquipmentAssignmentById": utils.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "equipment_assignment/{assignment_id}",
-			HandlerFunc: c.GetAssignmentsEquipmentAssignmentAssignmentIdGet,
+			HandlerFunc: c.GetEquipmentAssignmentById,
 		},
-		"UpdateAssignmentEquipmentAssignmentAssignmentIdPut": utils.Route{
+		"UpdateEquipmentAssignment": utils.Route{
 			Method:      strings.ToUpper("Put"),
 			Pattern:     "equipment_assignment/{assignment_id}",
-			HandlerFunc: c.UpdateAssignmentEquipmentAssignmentAssignmentIdPut,
+			HandlerFunc: c.UpdateEquipmentAssignment,
 		},
 	}
 }
 
-// AddAssignmentEquipmentAssignmentPost - Create assignment
-func (c *EquipmentAssignmentAPIController) AddAssignmentEquipmentAssignmentPost(w http.ResponseWriter, r *http.Request) {
+// AddEquipmentAssignment - Create assignment
+func (c *EquipmentAssignmentAPIController) AddEquipmentAssignment(w http.ResponseWriter, r *http.Request) {
 	equipmentAssignmentParam := models.EquipmentAssignment{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -113,7 +113,7 @@ func (c *EquipmentAssignmentAPIController) AddAssignmentEquipmentAssignmentPost(
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.AddAssignmentEquipmentAssignmentPost(r.Context(), equipmentAssignmentParam)
+	result, err := c.service.AddEquipmentAssignment(r.Context(), equipmentAssignmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -123,8 +123,8 @@ func (c *EquipmentAssignmentAPIController) AddAssignmentEquipmentAssignmentPost(
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// DeleteAssignmentEquipmentAssignmentAssignmentIdDelete - Delete assignment
-func (c *EquipmentAssignmentAPIController) DeleteAssignmentEquipmentAssignmentAssignmentIdDelete(w http.ResponseWriter, r *http.Request) {
+// DeleteEquipmentAssignment - Delete assignment
+func (c *EquipmentAssignmentAPIController) DeleteEquipmentAssignment(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	assignmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["assignment_id"],
@@ -134,7 +134,7 @@ func (c *EquipmentAssignmentAPIController) DeleteAssignmentEquipmentAssignmentAs
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.DeleteAssignmentEquipmentAssignmentAssignmentIdDelete(r.Context(), assignmentIdParam)
+	result, err := c.service.DeleteEquipmentAssignment(r.Context(), assignmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -144,9 +144,9 @@ func (c *EquipmentAssignmentAPIController) DeleteAssignmentEquipmentAssignmentAs
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetAssignmentEquipmentAssignmentGet - Get assignments
-func (c *EquipmentAssignmentAPIController) GetAssignmentEquipmentAssignmentGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetAssignmentEquipmentAssignmentGet(r.Context())
+// GetEquipmentAssignment - Get assignments
+func (c *EquipmentAssignmentAPIController) GetEquipmentAssignment(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetEquipmentAssignment(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -156,8 +156,8 @@ func (c *EquipmentAssignmentAPIController) GetAssignmentEquipmentAssignmentGet(w
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetAssignmentsEquipmentAssignmentAssignmentIdGet - Get assignment
-func (c *EquipmentAssignmentAPIController) GetAssignmentsEquipmentAssignmentAssignmentIdGet(w http.ResponseWriter, r *http.Request) {
+// GetEquipmentAssignmentById - Get assignment
+func (c *EquipmentAssignmentAPIController) GetEquipmentAssignmentById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	assignmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["assignment_id"],
@@ -167,7 +167,7 @@ func (c *EquipmentAssignmentAPIController) GetAssignmentsEquipmentAssignmentAssi
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetAssignmentsEquipmentAssignmentAssignmentIdGet(r.Context(), assignmentIdParam)
+	result, err := c.service.GetEquipmentAssignmentById(r.Context(), assignmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -177,8 +177,8 @@ func (c *EquipmentAssignmentAPIController) GetAssignmentsEquipmentAssignmentAssi
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// UpdateAssignmentEquipmentAssignmentAssignmentIdPut - Update assignment
-func (c *EquipmentAssignmentAPIController) UpdateAssignmentEquipmentAssignmentAssignmentIdPut(w http.ResponseWriter, r *http.Request) {
+// UpdateEquipmentAssignment - Update assignment
+func (c *EquipmentAssignmentAPIController) UpdateEquipmentAssignment(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	assignmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["assignment_id"],
@@ -203,7 +203,7 @@ func (c *EquipmentAssignmentAPIController) UpdateAssignmentEquipmentAssignmentAs
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateAssignmentEquipmentAssignmentAssignmentIdPut(r.Context(), assignmentIdParam, equipmentAssignmentParam)
+	result, err := c.service.UpdateEquipmentAssignment(r.Context(), assignmentIdParam, equipmentAssignmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

@@ -68,36 +68,36 @@ func NewEquipmentAPIController(s EquipmentAPIServicer, opts ...EquipmentAPIOptio
 // Routes returns all the api routes for the EquipmentAPIController
 func (c *EquipmentAPIController) Routes() utils.Routes {
 	return utils.Routes{
-		"AddEquipmentEquipmentPost": utils.Route{
+		"AddEquipment": utils.Route{
 			Method:      strings.ToUpper("Post"),
 			Pattern:     "equipment",
-			HandlerFunc: c.AddEquipmentEquipmentPost,
+			HandlerFunc: c.AddEquipment,
 		},
-		"DeleteEquipmentEquipmentEquipmentIdDelete": utils.Route{
+		"DeleteEquipment": utils.Route{
 			Method:      strings.ToUpper("Delete"),
 			Pattern:     "equipment/{equipment_id}",
-			HandlerFunc: c.DeleteEquipmentEquipmentEquipmentIdDelete,
+			HandlerFunc: c.DeleteEquipment,
 		},
-		"GetEquipmentEquipmentGet": utils.Route{
+		"GetEquipment": utils.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "equipment/",
-			HandlerFunc: c.GetEquipmentEquipmentGet,
+			HandlerFunc: c.GetEquipment,
 		},
-		"GetEquipmentsEquipmentEquipmentIdGet": utils.Route{
+		"GetEquipmentById": utils.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "equipment/{equipment_id}",
-			HandlerFunc: c.GetEquipmentsEquipmentEquipmentIdGet,
+			HandlerFunc: c.GetEquipmentById,
 		},
-		"UpdateEquipmentEquipmentEquipmentIdPut": utils.Route{
+		"UpdateEquipment": utils.Route{
 			Method:      strings.ToUpper("Put"),
 			Pattern:     "equipment/{equipment_id}",
-			HandlerFunc: c.UpdateEquipmentEquipmentEquipmentIdPut,
+			HandlerFunc: c.UpdateEquipment,
 		},
 	}
 }
 
-// AddEquipmentEquipmentPost - Create equipment
-func (c *EquipmentAPIController) AddEquipmentEquipmentPost(w http.ResponseWriter, r *http.Request) {
+// AddEquipment - Create equipment
+func (c *EquipmentAPIController) AddEquipment(w http.ResponseWriter, r *http.Request) {
 	equipmentParam := models.Equipment{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -113,7 +113,7 @@ func (c *EquipmentAPIController) AddEquipmentEquipmentPost(w http.ResponseWriter
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.AddEquipmentEquipmentPost(r.Context(), equipmentParam)
+	result, err := c.service.AddEquipment(r.Context(), equipmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -123,8 +123,8 @@ func (c *EquipmentAPIController) AddEquipmentEquipmentPost(w http.ResponseWriter
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// DeleteEquipmentEquipmentEquipmentIdDelete - Delete equipment
-func (c *EquipmentAPIController) DeleteEquipmentEquipmentEquipmentIdDelete(w http.ResponseWriter, r *http.Request) {
+// DeleteEquipment - Delete equipment
+func (c *EquipmentAPIController) DeleteEquipment(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	equipmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["equipment_id"],
@@ -134,7 +134,7 @@ func (c *EquipmentAPIController) DeleteEquipmentEquipmentEquipmentIdDelete(w htt
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.DeleteEquipmentEquipmentEquipmentIdDelete(r.Context(), equipmentIdParam)
+	result, err := c.service.DeleteEquipment(r.Context(), equipmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -144,9 +144,9 @@ func (c *EquipmentAPIController) DeleteEquipmentEquipmentEquipmentIdDelete(w htt
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetEquipmentEquipmentGet - Get equipments
-func (c *EquipmentAPIController) GetEquipmentEquipmentGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetEquipmentEquipmentGet(r.Context())
+// GetEquipment - Get equipments
+func (c *EquipmentAPIController) GetEquipment(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetEquipment(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -156,8 +156,8 @@ func (c *EquipmentAPIController) GetEquipmentEquipmentGet(w http.ResponseWriter,
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetEquipmentsEquipmentEquipmentIdGet - Get equipment
-func (c *EquipmentAPIController) GetEquipmentsEquipmentEquipmentIdGet(w http.ResponseWriter, r *http.Request) {
+// GetEquipmentById - Get equipment
+func (c *EquipmentAPIController) GetEquipmentById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	equipmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["equipment_id"],
@@ -167,7 +167,7 @@ func (c *EquipmentAPIController) GetEquipmentsEquipmentEquipmentIdGet(w http.Res
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetEquipmentsEquipmentEquipmentIdGet(r.Context(), equipmentIdParam)
+	result, err := c.service.GetEquipmentById(r.Context(), equipmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -177,8 +177,8 @@ func (c *EquipmentAPIController) GetEquipmentsEquipmentEquipmentIdGet(w http.Res
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// UpdateEquipmentEquipmentEquipmentIdPut - Update equipment
-func (c *EquipmentAPIController) UpdateEquipmentEquipmentEquipmentIdPut(w http.ResponseWriter, r *http.Request) {
+// UpdateEquipment - Update equipment
+func (c *EquipmentAPIController) UpdateEquipment(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	equipmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["equipment_id"],
@@ -203,7 +203,7 @@ func (c *EquipmentAPIController) UpdateEquipmentEquipmentEquipmentIdPut(w http.R
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateEquipmentEquipmentEquipmentIdPut(r.Context(), equipmentIdParam, equipmentParam)
+	result, err := c.service.UpdateEquipment(r.Context(), equipmentIdParam, equipmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

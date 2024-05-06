@@ -46,8 +46,8 @@ func NewUserAPIService() api.UserAPIServicer {
 	return &UserAPIService{}
 }
 
-// AddUserUserPost - Create user
-func (s *UserAPIService) AddUserUserPost(ctx context.Context, user models.User) (utils.ImplResponse, error) {
+// AddUser - Create user
+func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -63,8 +63,8 @@ func (s *UserAPIService) AddUserUserPost(ctx context.Context, user models.User) 
 
 }
 
-// DeleteUserUserUserIdDelete - Delete user
-func (s *UserAPIService) DeleteUserUserUserIdDelete(ctx context.Context, userId int32) (utils.ImplResponse, error) {
+// DeleteUser - Delete user
+func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -80,8 +80,8 @@ func (s *UserAPIService) DeleteUserUserUserIdDelete(ctx context.Context, userId 
 	return utils.Response(200, nil), nil
 }
 
-// GetUserUserGet - Get Users
-func (s *UserAPIService) GetUserUserGet(ctx context.Context) (utils.ImplResponse, error) {
+// GetUser - Get Users
+func (s *UserAPIService) GetUser(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
@@ -109,8 +109,8 @@ func (s *UserAPIService) GetUserUserGet(ctx context.Context) (utils.ImplResponse
 	return utils.Response(200, users), nil
 }
 
-// GetUserUserUserIdGet - Get user
-func (s *UserAPIService) GetUserUserUserIdGet(ctx context.Context, userId int32) (utils.ImplResponse, error) {
+// GetUserById - Get user
+func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.ImplResponse, error) {
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -132,8 +132,8 @@ func (s *UserAPIService) GetUserUserUserIdGet(ctx context.Context, userId int32)
 	return utils.Response(200, user), nil
 }
 
-// UpdateUserUserUserIdPut - Update user
-func (s *UserAPIService) UpdateUserUserUserIdPut(ctx context.Context, userId int32, user models.User) (utils.ImplResponse, error) {
+// UpdateUser - Update user
+func (s *UserAPIService) UpdateUser(ctx context.Context, userId int32, user models.User) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -145,11 +145,6 @@ func (s *UserAPIService) UpdateUserUserUserIdPut(ctx context.Context, userId int
 		fmt.Println(err)
 		return utils.Response(500, nil), errors.New("an error has occured while updating the data")
 	}
-	return utils.Response(202, nil), nil
-
-}
-
-func (s *UserAPIService) GetUserAssignmentIdGetAssignments() (utils.ImplResponse, error) {
 	return utils.Response(202, nil), nil
 
 }

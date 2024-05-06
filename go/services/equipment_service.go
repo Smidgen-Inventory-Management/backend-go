@@ -47,8 +47,8 @@ func NewEquipmentAPIService() api.EquipmentAPIServicer {
 	return &EquipmentAPIService{}
 }
 
-// AddEquipmentEquipmentPost - Create equipment
-func (s *EquipmentAPIService) AddEquipmentEquipmentPost(ctx context.Context, equipment models.Equipment) (utils.ImplResponse, error) {
+// AddEquipment - Create equipment
+func (s *EquipmentAPIService) AddEquipment(ctx context.Context, equipment models.Equipment) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -66,8 +66,8 @@ func (s *EquipmentAPIService) AddEquipmentEquipmentPost(ctx context.Context, equ
 	return utils.Response(202, nil), nil
 }
 
-// DeleteEquipmentEquipmentEquipmentIdDelete - Delete equipment
-func (s *EquipmentAPIService) DeleteEquipmentEquipmentEquipmentIdDelete(ctx context.Context, equipmentId int32) (utils.ImplResponse, error) {
+// DeleteEquipment - Delete equipment
+func (s *EquipmentAPIService) DeleteEquipment(ctx context.Context, equipmentId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -83,8 +83,8 @@ func (s *EquipmentAPIService) DeleteEquipmentEquipmentEquipmentIdDelete(ctx cont
 	return utils.Response(200, nil), nil
 }
 
-// GetEquipmentEquipmentGet - Get equipments
-func (s *EquipmentAPIService) GetEquipmentEquipmentGet(ctx context.Context) (utils.ImplResponse, error) {
+// GetEquipment - Get equipments
+func (s *EquipmentAPIService) GetEquipment(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
@@ -112,8 +112,8 @@ func (s *EquipmentAPIService) GetEquipmentEquipmentGet(ctx context.Context) (uti
 	return utils.Response(200, Assets), nil
 }
 
-// GetEquipmentsEquipmentEquipmentIdGet - Get equipment
-func (s *EquipmentAPIService) GetEquipmentsEquipmentEquipmentIdGet(ctx context.Context, equipmentId int32) (utils.ImplResponse, error) {
+// GetEquipmentById - Get equipment
+func (s *EquipmentAPIService) GetEquipmentById(ctx context.Context, equipmentId int32) (utils.ImplResponse, error) {
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -135,8 +135,8 @@ func (s *EquipmentAPIService) GetEquipmentsEquipmentEquipmentIdGet(ctx context.C
 	return utils.Response(200, equipment), nil
 }
 
-// UpdateEquipmentEquipmentEquipmentIdPut - Update equipment
-func (s *EquipmentAPIService) UpdateEquipmentEquipmentEquipmentIdPut(ctx context.Context, equipmentId int32, equipment models.Equipment) (utils.ImplResponse, error) {
+// UpdateEquipment - Update equipment
+func (s *EquipmentAPIService) UpdateEquipment(ctx context.Context, equipmentId int32, equipment models.Equipment) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {

@@ -68,36 +68,36 @@ func NewBusinessUnitAPIController(s BusinessUnitAPIServicer, opts ...BusinessUni
 // Routes returns all the api routes for the BusinessUnitAPIController
 func (c *BusinessUnitAPIController) Routes() utils.Routes {
 	return utils.Routes{
-		"AddUnitBusinessUnitPost": utils.Route{
+		"AddBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Post"),
 			Pattern:     "business_unit",
-			HandlerFunc: c.AddUnitBusinessUnitPost,
+			HandlerFunc: c.AddBusinessUnit,
 		},
-		"DeleteUnitBusinessUnitUnitIdDelete": utils.Route{
+		"DeletBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Delete"),
 			Pattern:     "business_unit/{unit_id}",
-			HandlerFunc: c.DeleteUnitBusinessUnitUnitIdDelete,
+			HandlerFunc: c.DeletBusinessUnit,
 		},
-		"GetUnitBusinessUnitGet": utils.Route{
+		"GetBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "business_unit/",
-			HandlerFunc: c.GetUnitBusinessUnitGet,
+			HandlerFunc: c.GetBusinessUnit,
 		},
-		"GetUnitsBusinessUnitUnitIdGet": utils.Route{
+		"GetBusinessUnitById": utils.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "business_unit/{unit_id}",
-			HandlerFunc: c.GetUnitsBusinessUnitUnitIdGet,
+			HandlerFunc: c.GetBusinessUnitById,
 		},
-		"UpdateUnitBusinessUnitUnitIdPut": utils.Route{
+		"UpdateBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Put"),
 			Pattern:     "business_unit/{unit_id}",
-			HandlerFunc: c.UpdateUnitBusinessUnitUnitIdPut,
+			HandlerFunc: c.UpdateBusinessUnit,
 		},
 	}
 }
 
-// AddUnitBusinessUnitPost - Create Business Unit
-func (c *BusinessUnitAPIController) AddUnitBusinessUnitPost(w http.ResponseWriter, r *http.Request) {
+// AddBusinessUnit - Create Business Unit
+func (c *BusinessUnitAPIController) AddBusinessUnit(w http.ResponseWriter, r *http.Request) {
 	businessUnitParam := models.BusinessUnit{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -113,7 +113,7 @@ func (c *BusinessUnitAPIController) AddUnitBusinessUnitPost(w http.ResponseWrite
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.AddUnitBusinessUnitPost(r.Context(), businessUnitParam)
+	result, err := c.service.AddBusinessUnit(r.Context(), businessUnitParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -123,8 +123,8 @@ func (c *BusinessUnitAPIController) AddUnitBusinessUnitPost(w http.ResponseWrite
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// DeleteUnitBusinessUnitUnitIdDelete - Delete Business Unit
-func (c *BusinessUnitAPIController) DeleteUnitBusinessUnitUnitIdDelete(w http.ResponseWriter, r *http.Request) {
+// DeletBusinessUnit - Delete Business Unit
+func (c *BusinessUnitAPIController) DeletBusinessUnit(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	unitIdParam, err := utils.ParseNumericParameter[int32](
 		params["unit_id"],
@@ -134,7 +134,7 @@ func (c *BusinessUnitAPIController) DeleteUnitBusinessUnitUnitIdDelete(w http.Re
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.DeleteUnitBusinessUnitUnitIdDelete(r.Context(), unitIdParam)
+	result, err := c.service.DeleteBusinessUnit(r.Context(), unitIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -144,9 +144,9 @@ func (c *BusinessUnitAPIController) DeleteUnitBusinessUnitUnitIdDelete(w http.Re
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetUnitBusinessUnitGet - Get Business Units
-func (c *BusinessUnitAPIController) GetUnitBusinessUnitGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetUnitBusinessUnitGet(r.Context())
+// GetBusinessUnit - Get Business Units
+func (c *BusinessUnitAPIController) GetBusinessUnit(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetBusinessUnit(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -156,8 +156,8 @@ func (c *BusinessUnitAPIController) GetUnitBusinessUnitGet(w http.ResponseWriter
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetUnitsBusinessUnitUnitIdGet - Get Business Unit
-func (c *BusinessUnitAPIController) GetUnitsBusinessUnitUnitIdGet(w http.ResponseWriter, r *http.Request) {
+// GetBusinessUnitById - Get Business Unit
+func (c *BusinessUnitAPIController) GetBusinessUnitById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	unitIdParam, err := utils.ParseNumericParameter[int32](
 		params["unit_id"],
@@ -167,7 +167,7 @@ func (c *BusinessUnitAPIController) GetUnitsBusinessUnitUnitIdGet(w http.Respons
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetUnitsBusinessUnitUnitIdGet(r.Context(), unitIdParam)
+	result, err := c.service.GetBusinessUnitById(r.Context(), unitIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -177,8 +177,8 @@ func (c *BusinessUnitAPIController) GetUnitsBusinessUnitUnitIdGet(w http.Respons
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// UpdateUnitBusinessUnitUnitIdPut - Update Business Unit
-func (c *BusinessUnitAPIController) UpdateUnitBusinessUnitUnitIdPut(w http.ResponseWriter, r *http.Request) {
+// UpdateBusinessUnit - Update Business Unit
+func (c *BusinessUnitAPIController) UpdateBusinessUnit(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	unitIdParam, err := utils.ParseNumericParameter[int32](
 		params["unit_id"],
@@ -203,7 +203,7 @@ func (c *BusinessUnitAPIController) UpdateUnitBusinessUnitUnitIdPut(w http.Respo
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateUnitBusinessUnitUnitIdPut(r.Context(), unitIdParam, businessUnitParam)
+	result, err := c.service.UpdateBusinessUnit(r.Context(), unitIdParam, businessUnitParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

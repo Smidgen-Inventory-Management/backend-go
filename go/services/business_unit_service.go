@@ -46,8 +46,8 @@ func NewBusinessUnitAPIService() api.BusinessUnitAPIServicer {
 	return &BusinessUnitAPIService{}
 }
 
-// AddUnitBusinessUnitPost - Create Business Unit
-func (s *BusinessUnitAPIService) AddUnitBusinessUnitPost(ctx context.Context, businessUnit models.BusinessUnit) (utils.ImplResponse, error) {
+// AddBusinessUnit - Create Business Unit
+func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUnit models.BusinessUnit) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -62,8 +62,8 @@ func (s *BusinessUnitAPIService) AddUnitBusinessUnitPost(ctx context.Context, bu
 	return utils.Response(202, nil), nil
 }
 
-// DeleteUnitBusinessUnitUnitIdDelete - Delete Business Unit
-func (s *BusinessUnitAPIService) DeleteUnitBusinessUnitUnitIdDelete(ctx context.Context, unitId int32) (utils.ImplResponse, error) {
+// DeleteBusinessUnit - Delete Business Unit
+func (s *BusinessUnitAPIService) DeleteBusinessUnit(ctx context.Context, unitId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -79,8 +79,8 @@ func (s *BusinessUnitAPIService) DeleteUnitBusinessUnitUnitIdDelete(ctx context.
 	return utils.Response(200, nil), nil
 }
 
-// GetUnitBusinessUnitGet - Get Business Units
-func (s *BusinessUnitAPIService) GetUnitBusinessUnitGet(ctx context.Context) (utils.ImplResponse, error) {
+// GetBusinessUnit - Get Business Units
+func (s *BusinessUnitAPIService) GetBusinessUnit(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
@@ -108,8 +108,8 @@ func (s *BusinessUnitAPIService) GetUnitBusinessUnitGet(ctx context.Context) (ut
 	return utils.Response(200, businessUnits), nil
 }
 
-// GetUnitsBusinessUnitUnitIdGet - Get Business Unit
-func (s *BusinessUnitAPIService) GetUnitsBusinessUnitUnitIdGet(ctx context.Context, unitId int32) (utils.ImplResponse, error) {
+// GetBusinessUnitById - Get Business Unit
+func (s *BusinessUnitAPIService) GetBusinessUnitById(ctx context.Context, unitId int32) (utils.ImplResponse, error) {
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
@@ -131,8 +131,8 @@ func (s *BusinessUnitAPIService) GetUnitsBusinessUnitUnitIdGet(ctx context.Conte
 	return utils.Response(200, unit), nil
 }
 
-// UpdateUnitBusinessUnitUnitIdPut - Update Business Unit
-func (s *BusinessUnitAPIService) UpdateUnitBusinessUnitUnitIdPut(ctx context.Context, unitId int32, businessUnit models.BusinessUnit) (utils.ImplResponse, error) {
+// UpdateBusinessUnit - Update Business Unit
+func (s *BusinessUnitAPIService) UpdateBusinessUnit(ctx context.Context, unitId int32, businessUnit models.BusinessUnit) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(privilege)
 	if err != nil {
