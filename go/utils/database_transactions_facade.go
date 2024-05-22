@@ -184,11 +184,19 @@ func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id in
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(args...)
+	result, err := stmt.Exec(args...)
 	if err != nil {
 		return err
 	}
 
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("user with id %d does not exist in table %s", id, tableName)
+	}
 	return tx.Commit()
 }
 
@@ -227,9 +235,18 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 		fieldValues = append(fieldValues, v.Field(i).Interface())
 	}
 
-	_, err = stmt.Exec(fieldValues...)
+	result, err := stmt.Exec(fieldValues...)
 	if err != nil {
 		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("user with id %d does not exist in table %s", id, tableName)
 	}
 
 	return tx.Commit()

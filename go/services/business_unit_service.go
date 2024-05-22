@@ -29,7 +29,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	api "smidgen-backend/go/api"
 	models "smidgen-backend/go/models"
 	utils "smidgen-backend/go/utils"
@@ -49,7 +48,7 @@ func NewBusinessUnitAPIService() api.BusinessUnitAPIServicer {
 // AddBusinessUnit - Create Business Unit
 func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUnit models.BusinessUnit) (utils.ImplResponse, error) {
 	privilege := "write"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -65,7 +64,7 @@ func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUn
 // DeleteBusinessUnit - Delete Business Unit
 func (s *BusinessUnitAPIService) DeleteBusinessUnit(ctx context.Context, unitId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -83,7 +82,7 @@ func (s *BusinessUnitAPIService) DeleteBusinessUnit(ctx context.Context, unitId 
 func (s *BusinessUnitAPIService) GetBusinessUnit(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -111,7 +110,7 @@ func (s *BusinessUnitAPIService) GetBusinessUnit(ctx context.Context) (utils.Imp
 // GetBusinessUnitById - Get Business Unit
 func (s *BusinessUnitAPIService) GetBusinessUnitById(ctx context.Context, unitId int32) (utils.ImplResponse, error) {
 	privilege := "read"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -134,7 +133,7 @@ func (s *BusinessUnitAPIService) GetBusinessUnitById(ctx context.Context, unitId
 // UpdateBusinessUnit - Update Business Unit
 func (s *BusinessUnitAPIService) UpdateBusinessUnit(ctx context.Context, unitId int32, businessUnit models.BusinessUnit) (utils.ImplResponse, error) {
 	privilege := "write"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}

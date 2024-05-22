@@ -29,7 +29,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+
 	api "smidgen-backend/go/api"
 	models "smidgen-backend/go/models"
 	utils "smidgen-backend/go/utils"
@@ -50,7 +50,7 @@ func NewEquipmentAPIService() api.EquipmentAPIServicer {
 // AddEquipment - Create equipment
 func (s *EquipmentAPIService) AddEquipment(ctx context.Context, equipment models.Equipment) (utils.ImplResponse, error) {
 	privilege := "write"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -58,7 +58,7 @@ func (s *EquipmentAPIService) AddEquipment(ctx context.Context, equipment models
 	err = dbConnection.InsertRow("equipment", equipment)
 	if err != nil {
 		if err.Error() == "23503" {
-			log.Println("unable to insert new data. The data requires reference to another table (foreign key constraint)")
+			fmt.Println("unable to insert new data. The data requires reference to another table (foreign key constraint)")
 			return utils.Response(400, nil), errors.New("the BusinessUnit with ID of " + strconv.Itoa(int(equipment.BusinessUnitId)) + " does not exist")
 		}
 		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
@@ -69,7 +69,7 @@ func (s *EquipmentAPIService) AddEquipment(ctx context.Context, equipment models
 // DeleteEquipment - Delete equipment
 func (s *EquipmentAPIService) DeleteEquipment(ctx context.Context, equipmentId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -87,7 +87,7 @@ func (s *EquipmentAPIService) DeleteEquipment(ctx context.Context, equipmentId i
 func (s *EquipmentAPIService) GetEquipment(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -115,7 +115,7 @@ func (s *EquipmentAPIService) GetEquipment(ctx context.Context) (utils.ImplRespo
 // GetEquipmentById - Get equipment
 func (s *EquipmentAPIService) GetEquipmentById(ctx context.Context, equipmentId int32) (utils.ImplResponse, error) {
 	privilege := "read"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -138,7 +138,7 @@ func (s *EquipmentAPIService) GetEquipmentById(ctx context.Context, equipmentId 
 // UpdateEquipment - Update equipment
 func (s *EquipmentAPIService) UpdateEquipment(ctx context.Context, equipmentId int32, equipment models.Equipment) (utils.ImplResponse, error) {
 	privilege := "write"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}

@@ -29,7 +29,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
+
 	api "smidgen-backend/go/api"
 	models "smidgen-backend/go/models"
 	utils "smidgen-backend/go/utils"
@@ -49,7 +49,7 @@ func NewEquipmentAssignmentAPIService() api.EquipmentAssignmentAPIServicer {
 // AddEquipmentAssignment - Create assignment
 func (s *EquipmentAssignmentAPIService) AddEquipmentAssignment(ctx context.Context, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
 	privilege := "write"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -65,7 +65,7 @@ func (s *EquipmentAssignmentAPIService) AddEquipmentAssignment(ctx context.Conte
 // DeleteEquipmentAssignment - Delete assignment
 func (s *EquipmentAssignmentAPIService) DeleteEquipmentAssignment(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -83,7 +83,7 @@ func (s *EquipmentAssignmentAPIService) DeleteEquipmentAssignment(ctx context.Co
 func (s *EquipmentAssignmentAPIService) GetEquipmentAssignment(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -111,7 +111,7 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignment(ctx context.Conte
 // GetEquipmnentAssignmentById - Get assignment
 func (s *EquipmentAssignmentAPIService) GetEquipmentAssignmentById(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
 	privilege := "read"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -134,7 +134,7 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignmentById(ctx context.C
 // UpdateEquipmentAssignment - Update assignment
 func (s *EquipmentAssignmentAPIService) UpdateEquipmentAssignment(ctx context.Context, assignmentId int32, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
 	privilege := "write"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}

@@ -26,6 +26,7 @@
 package smidgen
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -40,13 +41,7 @@ func Logger(inner http.Handler, name string) http.Handler {
 
 		inner.ServeHTTP(w, r)
 
-		Log().Info(
-			"[%s %s] %s TTE: %s",
-			r.Method,
-			r.RequestURI,
-			name,
-			time.Since(start),
-		)
+		Log().Info(fmt.Sprintf("[%s %s] %s TTE: %s", r.Method, r.RequestURI, name, time.Since(start)))
 	})
 }
 
@@ -72,7 +67,6 @@ func Log() *logger.Logger {
 		Padding(0, 1, 0, 1).
 		Background(lipgloss.Color("#00ff00")).
 		Foreground(lipgloss.Color("0"))
-
 	logger := logger.NewWithOptions(os.Stderr, logger.Options{
 		ReportCaller:    true,
 		ReportTimestamp: true,

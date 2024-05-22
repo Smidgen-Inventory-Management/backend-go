@@ -29,11 +29,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	api "smidgen-backend/go/api"
 	models "smidgen-backend/go/models"
 	utils "smidgen-backend/go/utils"
 )
+
+var log = utils.Log()
 
 // UserAPIService is a service that implements the logic for the UserAPIServicer
 // This service should implement the business logic for every endpoint for the UserAPI API.
@@ -49,14 +50,14 @@ func NewUserAPIService() api.UserAPIServicer {
 // AddUser - Create user
 func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.ImplResponse, error) {
 	privilege := "write"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.InsertRow("user_table", user)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
 	}
 	return utils.Response(202, nil), nil
@@ -66,15 +67,15 @@ func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.I
 // DeleteUser - Delete user
 func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.DeleteRow("user_table", "userid", userId)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return utils.Response(500, nil), err
+		log.Errorf("Error: %v", err)
+		return utils.Response(404, nil), err
 	}
 
 	return utils.Response(200, nil), nil
@@ -84,23 +85,27 @@ func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.Im
 func (s *UserAPIService) GetUser(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	var dest models.User
 	rows, err := dbConnection.GetRows("user_table", &dest)
-	if err != nil {
-		fmt.Println("Error:", err)
 
+	if err != nil {
+		log.Errorf("Error: %v", err)
+	}
+
+	if len(rows) <= 0 {
+		return utils.Response(404, nil), fmt.Errorf("no users were found in the database")
 	}
 
 	var users []models.User
 	for _, row := range rows {
 		user, ok := row.(models.User)
 		if !ok {
-			fmt.Println("Error: Unexpected type in row")
+			log.Error("Error: Unexpected type in row")
 			continue
 		}
 		users = append(users, user)
@@ -112,7 +117,7 @@ func (s *UserAPIService) GetUser(ctx context.Context) (utils.ImplResponse, error
 // GetUserById - Get user
 func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.ImplResponse, error) {
 	privilege := "read"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
@@ -120,13 +125,13 @@ func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.I
 	var dest models.User
 	row, err := dbConnection.GetByID("user_table", "userId", userId, &dest)
 	if err != nil {
-		fmt.Println("Data Not Found:", err)
+		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
 	}
 
 	user, ok := row.(models.User)
 	if !ok {
-		fmt.Println("Error: Unexpected type in row")
+		log.Error("Error: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
 	return utils.Response(200, user), nil
@@ -135,15 +140,15 @@ func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.I
 // UpdateUser - Update user
 func (s *UserAPIService) UpdateUser(ctx context.Context, userId int32, user models.User) (utils.ImplResponse, error) {
 	privilege := "write"
-	dbConnection, err := utils.NewDatabaseConnection(privilege)
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.UpdateRow("user_table", "userid", userId, user)
 	if err != nil {
-		fmt.Println(err)
-		return utils.Response(500, nil), errors.New("an error has occured while updating the data")
+		log.Error(err)
+		return utils.Response(400, nil), err
 	}
 	return utils.Response(202, nil), nil
 

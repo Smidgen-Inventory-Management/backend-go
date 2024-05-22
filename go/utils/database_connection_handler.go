@@ -38,7 +38,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var log = Log()
 
 type DatabaseConnection struct {
 	db        *sql.DB
@@ -61,17 +60,19 @@ type databaseCredentials struct {
 	Database string `yaml:"database"`
 }
 
-func NewDatabaseConnection(privilege string) (*DatabaseConnection, error) {
+var log = Log()
+
+func NewDatabaseConnection(configPath string, privilege string) (*DatabaseConnection, error) {
 	instance := &DatabaseConnection{privilege: privilege}
-	initErr := instance.initialize(privilege)
+	initErr := instance.initialize(configPath, privilege)
 	if initErr != nil {
 		return nil, fmt.Errorf("failed to initialize database connection: %v", initErr)
 	}
 	return instance, nil
 }
 
-func (dao *DatabaseConnection) initialize(privilege string) error {
-	yamlFilePath := os.Args[2]
+func (dao *DatabaseConnection) initialize(configPath string, privilege string) error {
+	yamlFilePath := configPath
 	yamlFile, err := os.Open(yamlFilePath)
 	if err != nil {
 		return fmt.Errorf("\nfailed to open YAML file: %v", err)
@@ -93,7 +94,7 @@ func (dao *DatabaseConnection) initialize(privilege string) error {
 	if !field.IsValid() {
 		return fmt.Errorf("\ninvalid privilege level")
 	}
-	log.Info("Successfully loaded %v connection configurations.", privilege)
+	log.Info(fmt.Sprintf("Successfully loaded %v connection configurations.", privilege))
 	connectionConfig := field.Interface().(databaseCredentials)
 
 	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",

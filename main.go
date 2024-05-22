@@ -43,36 +43,47 @@ import (
 var log = utils.Log()
 
 func main() {
-	if len(os.Args) < 3 {
-		fmt.Println("Usage: go run main.go <path_to_server_configurations> <path_to_database_configurations>")
+	_, err := os.Stat("configs")
+	dirExists := !os.IsNotExist(err)
+	argsLength := (len(os.Args) < 3)
+
+	if !dirExists && argsLength {
+		log.Error("Path to configuration files not found. Ensure you have a \"configs\" directory, or run the server with the appropriate arguments.")
+		log.Error("Usage: go run main.go <path_to_server_configurations> <path_to_database_configurations>")
 		return
+	} else if dirExists {
+		utils.ServerConfigPath = "configs/server.yaml"
+		utils.DatabaseConfigPath = "configs/db_conn.yaml"
+	} else {
+		utils.ServerConfigPath = os.Args[1]
+		utils.DatabaseConfigPath = os.Args[2]
 	}
 
-	serverConfig, err := LoadServerConfig(os.Args[1])
+	serverConfig, err := LoadServerConfig(utils.ServerConfigPath)
 	if err != nil {
 		log.Fatalf("Failed to load server config: %v", err)
 	} else {
-		log.Info("Loaded server configurations.")
+		log.Debug("Loaded server configurations.")
 	}
 
 	envConfig, ok := serverConfig.Environments["Development"]
 	if !ok {
 		log.Fatal("Environment configuration not found")
 	} else {
-		log.Info("Loaded server environment configurations.")
+		log.Debug("Loaded server environment configurations.")
 	}
 
-	if err := retryDatabaseConnection(); err != nil {
+	if err := retryDatabaseConnection(utils.DatabaseConfigPath); err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	} else {
-		log.Info("Database connection successful!")
+		log.Debug("Database connection successful!")
 	}
 
 	hostname := envConfig.Host + ":" + envConfig.Port
 	router := loadRoutes(envConfig)
 
-	log.Info("Routes loaded.")
-	log.Info("Server starting on %s", hostname)
+	log.Debug("Routes loaded.")
+	log.Info(fmt.Sprintf("Server starting on %s", hostname))
 
 	err = http.ListenAndServe(hostname, router)
 	if err != nil {
@@ -80,16 +91,16 @@ func main() {
 	}
 }
 
-func retryDatabaseConnection() error {
+func retryDatabaseConnection(configPath string) error {
 	const maxRetries = 3
 	for attempt := 1; attempt <= maxRetries; attempt++ {
-		if err := CheckDatabaseConnection(); err != nil {
+		if err := CheckDatabaseConnection(configPath); err != nil {
 			if attempt < maxRetries {
 				log.Warn("Failed to connect to database. Retrying in 3 seconds... (Attempt %d/%d)", attempt, maxRetries)
 				time.Sleep(3 * time.Second)
 				continue
 			}
-			return fmt.Errorf("failed to connect to database after %d attempts. Verify the database is running then relaunch the server", maxRetries)
+			return fmt.Errorf(fmt.Sprintf("failed to connect to database after %d attempts. Verify the database is running then relaunch the server", maxRetries))
 		}
 		return nil
 	}
@@ -102,27 +113,29 @@ func loadRoutes(environmentConfig struct {
 	Debug    bool   "yaml:\"debug\""
 	RootPath string "yaml:\"root_path\""
 }) *mux.Router {
-	BusinessUnitAPIService := service.NewBusinessUnitAPIService()
-	BusinessUnitAPIController := api.NewBusinessUnitAPIController(BusinessUnitAPIService)
 
 	DefaultAPIService := service.NewDefaultAPIService()
-	DefaultAPIController := api.NewDefaultAPIController(DefaultAPIService)
-
+	BusinessUnitAPIService := service.NewBusinessUnitAPIService()
 	EquipmentAPIService := service.NewEquipmentAPIService()
-	EquipmentAPIController := api.NewEquipmentAPIController(EquipmentAPIService)
-
 	EquipmentAssignmentAPIService := service.NewEquipmentAssignmentAPIService()
-	EquipmentAssignmentAPIController := api.NewEquipmentAssignmentAPIController(EquipmentAssignmentAPIService)
-
 	UserAPIService := service.NewUserAPIService()
+	log.Debug("Loaded API Services")
+
+
+	DefaultAPIController := api.NewDefaultAPIController(DefaultAPIService)
+	BusinessUnitAPIController := api.NewBusinessUnitAPIController(BusinessUnitAPIService)
+	EquipmentAPIController := api.NewEquipmentAPIController(EquipmentAPIService)
+	EquipmentAssignmentAPIController := api.NewEquipmentAssignmentAPIController(EquipmentAssignmentAPIService)
 	UserAPIController := api.NewUserAPIController(UserAPIService)
+	log.Debug("Loaded API Controllers")
 
 	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController)
+
 	return router
 }
 
-func CheckDatabaseConnection() error {
-	db, err := utils.NewDatabaseConnection("read") // Assuming you want to check the read database connection
+func CheckDatabaseConnection(configPath string) error {
+	db, err := utils.NewDatabaseConnection(configPath, "read")
 	if err != nil {
 		return fmt.Errorf("failed to create database connection: %v", err)
 	}
