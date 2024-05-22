@@ -45,7 +45,7 @@ func Logger(inner http.Handler, name string) http.Handler {
 	})
 }
 
-func Log() *logger.Logger {
+func Log(debug ...bool) *logger.Logger {
 	styles := logger.DefaultStyles()
 	styles.Levels[logger.ErrorLevel] = lipgloss.NewStyle().
 		SetString("ERROR").
@@ -67,10 +67,19 @@ func Log() *logger.Logger {
 		Padding(0, 1, 0, 1).
 		Background(lipgloss.Color("#00ff00")).
 		Foreground(lipgloss.Color("0"))
+	styles.Levels[logger.DebugLevel] = lipgloss.NewStyle().
+		SetString("DEBUG").
+		Padding(0, 1, 0, 1).
+		Background(lipgloss.Color("#a033ff")).
+		Foreground(lipgloss.Color("0"))
 	logger := logger.NewWithOptions(os.Stderr, logger.Options{
 		ReportCaller:    true,
 		ReportTimestamp: true,
 	})
+
+	if len(debug) > 0 && debug[0] {
+		logger.SetLevel(-4)
+	}
 
 	logger.SetStyles(styles)
 	return logger

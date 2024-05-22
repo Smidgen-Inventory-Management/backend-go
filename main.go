@@ -73,6 +73,10 @@ func main() {
 		log.Debug("Loaded server environment configurations.")
 	}
 
+	if envConfig.Debug{
+		log = utils.Log(true)
+	}
+
 	if err := retryDatabaseConnection(utils.DatabaseConfigPath); err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	} else {
