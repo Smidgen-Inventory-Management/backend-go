@@ -88,9 +88,14 @@ func main() {
 	router := loadRoutes(envConfig)
 
 	log.Debug("Routes loaded.")
-	log.Infof("Server started on %s", hostname)
-
-	err = http.ListenAndServe(hostname, router)
+	log.Infof("Server starting on %s", hostname)
+	server := &http.Server{
+		Addr:         hostname,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		Handler:      router,
+	}
+	err = server.ListenAndServe()
 	if err != nil {
 		log.Errorf("Failed to start server: %v", err)
 	}
