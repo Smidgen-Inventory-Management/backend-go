@@ -176,7 +176,7 @@ func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id in
 		}
 	}()
 
-	query := fmt.Sprintf("DELETE FROM smidgen.%s WHERE %s=%v", tableName, idLabel, id)
+	query := fmt.Sprintf("DELETE FROM smidgen.%s WHERE %s=$1", tableName, idLabel)
 
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -184,7 +184,7 @@ func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id in
 	}
 	defer stmt.Close()
 
-	result, err := stmt.Exec(args...)
+	result, err := stmt.Exec(id)
 	if err != nil {
 		return err
 	}
@@ -205,14 +205,14 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 	objectType := v.Type()
 
 	var setValues []string
-	for i := 1; i < v.NumField(); i++ { // Start from index 1 to exclude the first column
+	for i := 1; i < v.NumField(); i++ {
 		fieldName := objectType.Field(i).Name
 		setValues = append(setValues, fmt.Sprintf("%s=$%d", fieldName, i))
 	}
 
 	setClause := strings.Join(setValues, ", ")
 
-	query := fmt.Sprintf("UPDATE smidgen.%s SET %s WHERE %s=%v", tableName, setClause, idLabel, id)
+	query := fmt.Sprintf("UPDATE smidgen.%s SET %s WHERE %s=$1", tableName, setClause, idLabel)
 
 	tx, err := dao.db.Begin()
 	if err != nil {
@@ -234,6 +234,7 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 	for i := 1; i < v.NumField(); i++ { // Start from index 1 to exclude the first column
 		fieldValues = append(fieldValues, v.Field(i).Interface())
 	}
+	fieldValues = append(fieldValues, id)
 
 	result, err := stmt.Exec(fieldValues...)
 	if err != nil {

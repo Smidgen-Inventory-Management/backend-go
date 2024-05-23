@@ -87,7 +87,7 @@ func main() {
 	router := loadRoutes(envConfig)
 
 	log.Debug("Routes loaded.")
-	log.Info(fmt.Sprintf("Server starting on %s", hostname))
+	log.Infof("Server started on %s", hostname)
 
 	err = http.ListenAndServe(hostname, router)
 	if err != nil {
@@ -109,32 +109,6 @@ func retryDatabaseConnection(configPath string) error {
 		return nil
 	}
 	return nil
-}
-
-func loadRoutes(environmentConfig struct {
-	Host     string "yaml:\"host\""
-	Port     string "yaml:\"port\""
-	Debug    bool   "yaml:\"debug\""
-	RootPath string "yaml:\"root_path\""
-}) *mux.Router {
-
-	DefaultAPIService := service.NewDefaultAPIService()
-	BusinessUnitAPIService := service.NewBusinessUnitAPIService()
-	EquipmentAPIService := service.NewEquipmentAPIService()
-	EquipmentAssignmentAPIService := service.NewEquipmentAssignmentAPIService()
-	UserAPIService := service.NewUserAPIService()
-	log.Debug("Loaded API Services")
-
-	DefaultAPIController := api.NewDefaultAPIController(DefaultAPIService)
-	BusinessUnitAPIController := api.NewBusinessUnitAPIController(BusinessUnitAPIService)
-	EquipmentAPIController := api.NewEquipmentAPIController(EquipmentAPIService)
-	EquipmentAssignmentAPIController := api.NewEquipmentAssignmentAPIController(EquipmentAssignmentAPIService)
-	UserAPIController := api.NewUserAPIController(UserAPIService)
-	log.Debug("Loaded API Controllers")
-
-	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController)
-
-	return router
 }
 
 func CheckDatabaseConnection(configPath string) error {
@@ -176,4 +150,30 @@ func LoadServerConfig(yamlFilePath string) (models.ServerConfig, error) {
 	}
 
 	return config, nil
+}
+
+func loadRoutes(environmentConfig struct {
+	Host     string "yaml:\"host\""
+	Port     string "yaml:\"port\""
+	Debug    bool   "yaml:\"debug\""
+	RootPath string "yaml:\"root_path\""
+}) *mux.Router {
+
+	DefaultAPIService := service.NewDefaultAPIService()
+	BusinessUnitAPIService := service.NewBusinessUnitAPIService()
+	EquipmentAPIService := service.NewEquipmentAPIService()
+	EquipmentAssignmentAPIService := service.NewEquipmentAssignmentAPIService()
+	UserAPIService := service.NewUserAPIService()
+	log.Debug("Loaded API Services")
+
+	DefaultAPIController := api.NewDefaultAPIController(DefaultAPIService)
+	BusinessUnitAPIController := api.NewBusinessUnitAPIController(BusinessUnitAPIService)
+	EquipmentAPIController := api.NewEquipmentAPIController(EquipmentAPIService)
+	EquipmentAssignmentAPIController := api.NewEquipmentAssignmentAPIController(EquipmentAssignmentAPIService)
+	UserAPIController := api.NewUserAPIController(UserAPIService)
+	log.Debug("Loaded API Controllers")
+
+	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController)
+
+	return router
 }
