@@ -29,7 +29,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	api "smidgen-backend/go/api"
 	models "smidgen-backend/go/models"
 	utils "smidgen-backend/go/utils"
@@ -56,7 +55,7 @@ func (s *EquipmentAssignmentAPIService) AddEquipmentAssignment(ctx context.Conte
 
 	err = dbConnection.InsertRow("equipmentAssignment", equipmentAssignment)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
 	}
 	return utils.Response(202, nil), nil
@@ -72,8 +71,8 @@ func (s *EquipmentAssignmentAPIService) DeleteEquipmentAssignment(ctx context.Co
 
 	err = dbConnection.DeleteRow("equipment", "equipmentid", assignmentId)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return utils.Response(500, nil), err
+		log.Errorf("Error: %v", err)
+		return utils.Response(404, nil), err
 	}
 
 	return utils.Response(200, nil), nil
@@ -90,16 +89,20 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignment(ctx context.Conte
 
 	var dest models.EquipmentAssignment
 	rows, err := dbConnection.GetRows("equipmentAssignment", &dest)
-	if err != nil {
-		fmt.Println("Error:", err)
 
+	if err != nil {
+		log.Error("Error: %v", err)
+	}
+
+	if len(rows) <= 0 {
+		return utils.Response(404, nil), fmt.Errorf("no equipment assignments were found in the database")
 	}
 
 	var Assignments []models.EquipmentAssignment
 	for _, row := range rows {
 		Assignment, ok := row.(models.EquipmentAssignment)
 		if !ok {
-			fmt.Println("Error: Unexpected type in row")
+			log.Warn("Warn: Unexpected type in row")
 			continue
 		}
 		Assignments = append(Assignments, Assignment)
@@ -119,13 +122,13 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignmentById(ctx context.C
 	var dest models.Equipment
 	row, err := dbConnection.GetByID("equipmetnAssignment", "assignmentId", assignmentId, &dest)
 	if err != nil {
-		fmt.Println("Data Not Found:", err)
+		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
 	}
 
 	assignment, ok := row.(models.EquipmentAssignment)
 	if !ok {
-		fmt.Println("Error: Unexpected type in row")
+		log.Warn("Warn: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
 	return utils.Response(200, assignment), nil
@@ -141,8 +144,8 @@ func (s *EquipmentAssignmentAPIService) UpdateEquipmentAssignment(ctx context.Co
 
 	err = dbConnection.UpdateRow("equipmentAssignment", "assignmentid", assignmentId, equipmentAssignment)
 	if err != nil {
-		fmt.Println(err)
-		return utils.Response(500, nil), errors.New("an error has occured while updating the data")
+		log.Error(err)
+		return utils.Response(400, nil), err
 	}
 	return utils.Response(202, nil), nil
 }

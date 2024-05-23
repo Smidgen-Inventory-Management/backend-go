@@ -61,7 +61,6 @@ func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.I
 		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
 	}
 	return utils.Response(202, nil), nil
-
 }
 
 // DeleteUser - Delete user
@@ -105,7 +104,7 @@ func (s *UserAPIService) GetUser(ctx context.Context) (utils.ImplResponse, error
 	for _, row := range rows {
 		user, ok := row.(models.User)
 		if !ok {
-			log.Error("Error: Unexpected type in row")
+			log.Warn("Warn: Unexpected type in row")
 			continue
 		}
 		users = append(users, user)
@@ -131,7 +130,7 @@ func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.I
 
 	user, ok := row.(models.User)
 	if !ok {
-		log.Error("Error: Unexpected type in row")
+		log.Warn("Warn: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
 	return utils.Response(200, user), nil
@@ -151,5 +150,4 @@ func (s *UserAPIService) UpdateUser(ctx context.Context, userId int32, user mode
 		return utils.Response(400, nil), err
 	}
 	return utils.Response(202, nil), nil
-
 }

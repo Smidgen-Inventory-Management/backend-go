@@ -104,7 +104,7 @@ func (s *EquipmentAPIService) GetEquipment(ctx context.Context) (utils.ImplRespo
 	for _, row := range rows {
 		equipment, ok := row.(models.Equipment)
 		if !ok {
-			log.Error("Error: Unexpected type in row")
+			log.Warn("Warn: Unexpected type in row")
 			continue
 		}
 		Assets = append(Assets, equipment)
@@ -130,7 +130,7 @@ func (s *EquipmentAPIService) GetEquipmentById(ctx context.Context, equipmentId 
 
 	equipment, ok := row.(models.Equipment)
 	if !ok {
-		log.Error("Error: Unexpected type in row")
+		log.Warn("Warn: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
 	return utils.Response(200, equipment), nil
