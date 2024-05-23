@@ -96,7 +96,7 @@ func (s *UserAPIService) GetUser(ctx context.Context) (utils.ImplResponse, error
 		log.Errorf("Error: %v", err)
 	}
 
-	if len(rows) <= 0 {
+	if len(rows) == 0 {
 		return utils.Response(404, nil), fmt.Errorf("no users were found in the database")
 	}
 

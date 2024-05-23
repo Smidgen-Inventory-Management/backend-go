@@ -211,8 +211,7 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 	}
 
 	setClause := strings.Join(setValues, ", ")
-
-	query := fmt.Sprintf("UPDATE smidgen.%s SET %s WHERE %s=$1", tableName, setClause, idLabel)
+	query := fmt.Sprintf("UPDATE smidgen.%s SET %s WHERE %s=%v", tableName, setClause, idLabel, id)
 
 	tx, err := dao.db.Begin()
 	if err != nil {
@@ -234,7 +233,6 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 	for i := 1; i < v.NumField(); i++ { // Start from index 1 to exclude the first column
 		fieldValues = append(fieldValues, v.Field(i).Interface())
 	}
-	fieldValues = append(fieldValues, id)
 
 	result, err := stmt.Exec(fieldValues...)
 	if err != nil {

@@ -94,7 +94,7 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignment(ctx context.Conte
 		log.Error("Error: %v", err)
 	}
 
-	if len(rows) <= 0 {
+	if len(rows) == 0 {
 		return utils.Response(404, nil), fmt.Errorf("no equipment assignments were found in the database")
 	}
 

@@ -97,7 +97,7 @@ func (s *EquipmentAPIService) GetEquipment(ctx context.Context) (utils.ImplRespo
 	if err != nil {
 		log.Errorf("Error: %v", err)
 	}
-	if len(rows) <= 0 {
+	if len(rows) == 0 {
 		return utils.Response(404, nil), fmt.Errorf("no equipment was found in the database")
 	}
 	var Assets []models.Equipment

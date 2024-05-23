@@ -47,14 +47,15 @@ func main() {
 	dirExists := !os.IsNotExist(err)
 	argsLength := (len(os.Args) < 3)
 
-	if !dirExists && argsLength {
+	switch {
+	case !dirExists && argsLength:
 		log.Error("Path to configuration files not found. Ensure you have a \"configs\" directory, or run the server with the appropriate arguments.")
 		log.Error("Usage: go run main.go <path_to_server_configurations> <path_to_database_configurations>")
 		return
-	} else if dirExists {
+	case dirExists:
 		utils.ServerConfigPath = "configs/server.yaml"
 		utils.DatabaseConfigPath = "configs/db_conn.yaml"
-	} else {
+	default:
 		utils.ServerConfigPath = os.Args[1]
 		utils.DatabaseConfigPath = os.Args[2]
 	}
