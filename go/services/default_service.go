@@ -56,9 +56,11 @@ func (s *DefaultAPIService) CheckHealthcheckGet(ctx context.Context) (utils.Impl
 	var services []healthCheck
 	db, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "read")
 	if err != nil {
-		log.Fatalf("failed to create database connection: %v", err)
+		log.Errorf("failed to create database connection: %v", err)
+		healthcheckEnd := time.Since(healthcheckStart)
+		services = append(services, healthCheck{"API Server", "OK", healthcheckEnd})
 		services = append(services, healthCheck{"Database", "DOWN", -1})
-		return utils.Response(500, "Failed to connect to database"), nil
+		return utils.Response(500, services), nil
 	}
 	defer func() {
 		if db != nil {
@@ -67,9 +69,11 @@ func (s *DefaultAPIService) CheckHealthcheckGet(ctx context.Context) (utils.Impl
 	}()
 
 	if db == nil {
-		log.Fatalf("database connection is nil")
+		log.Errorf("database connection is nil")
+		healthcheckEnd := time.Since(healthcheckStart)
+		services = append(services, healthCheck{"API Server", "OK", healthcheckEnd})
 		services = append(services, healthCheck{"Database", "DEGREDADED", -1})
-		return utils.Response(500, "Failed to connect to database"), nil
+		return utils.Response(500, services), nil
 	}
 
 	start := time.Now()
@@ -77,9 +81,11 @@ func (s *DefaultAPIService) CheckHealthcheckGet(ctx context.Context) (utils.Impl
 	latency := time.Since(start)
 
 	if err != nil {
-		log.Fatalf("failed to ping database: %v", err)
+		log.Errorf("failed to ping database: %v", err)
+		healthcheckEnd := time.Since(healthcheckStart)
+		services = append(services, healthCheck{"API Server", "OK", healthcheckEnd})
 		services = append(services, healthCheck{"Database", "DEGREDADED", -1})
-		return utils.Response(500, "Failed to connect to database"), nil
+		return utils.Response(500, services), nil
 	}
 
 	log.Infof("connection to database successfully established in %s", latency)
@@ -92,5 +98,5 @@ func (s *DefaultAPIService) CheckHealthcheckGet(ctx context.Context) (utils.Impl
 
 // RootGet - Root
 func (s *DefaultAPIService) RootGet(ctx context.Context) (utils.ImplResponse, error) {
-	return utils.Response(403, nil),nil
+	return utils.Response(403, nil), nil
 }

@@ -50,7 +50,7 @@ func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUn
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.InsertRow("businessunit", businessUnit)
@@ -66,7 +66,7 @@ func (s *BusinessUnitAPIService) DeleteBusinessUnit(ctx context.Context, unitId 
 	privilege := "delete"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.DeleteRow("businessUnit", "UnitID", unitId)
@@ -84,7 +84,7 @@ func (s *BusinessUnitAPIService) GetBusinessUnit(ctx context.Context) (utils.Imp
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	var dest models.BusinessUnit
@@ -116,7 +116,7 @@ func (s *BusinessUnitAPIService) GetBusinessUnitById(ctx context.Context, unitId
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	var dest models.BusinessUnit
@@ -139,7 +139,7 @@ func (s *BusinessUnitAPIService) UpdateBusinessUnit(ctx context.Context, unitId 
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.UpdateRow("businessUnit", "unitid", unitId, businessUnit)

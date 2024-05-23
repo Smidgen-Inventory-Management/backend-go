@@ -66,7 +66,8 @@ func NewDatabaseConnection(configPath string, privilege string) (*DatabaseConnec
 	instance := &DatabaseConnection{privilege: privilege}
 	initErr := instance.initialize(configPath, privilege)
 	if initErr != nil {
-		return nil, fmt.Errorf("failed to initialize database connection: %v", initErr)
+		log.Errorf("failed to initialize database connection: %v", initErr)
+		return nil, initErr
 	}
 	return instance, nil
 }
@@ -75,24 +76,28 @@ func (dao *DatabaseConnection) initialize(configPath string, privilege string) e
 	yamlFilePath := configPath
 	yamlFile, err := os.Open(yamlFilePath)
 	if err != nil {
-		return fmt.Errorf("\nfailed to open YAML file: %v", err)
+		log.Errorf("failed to initialize database connection: %v", err)
+		return err
 	}
 	defer yamlFile.Close()
 
 	yamlData, err := io.ReadAll(yamlFile)
 	if err != nil {
-		return fmt.Errorf("\nfailed to read YAML file: %v", err)
+		log.Errorf("\nfailed to read YAML file: %v", err)
+		return err
 	}
 	var config databaseConfig
 
 	if err := yaml.Unmarshal(yamlData, &config); err != nil {
-		return fmt.Errorf("\nfailed to unmarshal YAML: %v", err)
+		log.Errorf("\nfailed to unmarshal YAML: %v", err)
+		return err
 	}
 	log.Info("Successfully loaded database configurations.")
 
 	field := reflect.ValueOf(&config).Elem().FieldByName(strings.ToUpper(privilege[:1]) + privilege[1:])
 	if !field.IsValid() {
-		return fmt.Errorf("\ninvalid privilege level")
+		log.Errorf("\ninvalid privilege level")
+		return err
 	}
 	log.Info(fmt.Sprintf("Successfully loaded %v connection configurations.", privilege))
 	connectionConfig := field.Interface().(databaseCredentials)
@@ -102,10 +107,12 @@ func (dao *DatabaseConnection) initialize(configPath string, privilege string) e
 
 	db, err := sql.Open("postgres", dataSourceName)
 	if err != nil {
-		return fmt.Errorf("\nfailed to open database connection: %v", err)
+		log.Errorf("\nfailed to open database connection: %v", err)
+		return err
 	}
 	if err := db.Ping(); err != nil {
-		return fmt.Errorf("\nfailed to ping database: %v", err)
+		log.Errorf("\nfailed to ping database: %v", err)
+		return err
 	}
 	dao.db = db
 	return nil
@@ -116,7 +123,8 @@ func (dao *DatabaseConnection) Close() error {
 	defer dao.mu.Unlock()
 	if dao.db != nil {
 		if err := dao.db.Close(); err != nil {
-			return fmt.Errorf("\nfailed to close database connection: %v", err)
+			log.Errorf("\nfailed to close database connection: %v", err)
+			return err
 		}
 		dao.db = nil
 	}

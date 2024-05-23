@@ -61,7 +61,7 @@ func main() {
 
 	serverConfig, err := LoadServerConfig(utils.ServerConfigPath)
 	if err != nil {
-		log.Fatalf("Failed to load server config: %v", err)
+		log.Errorf("Failed to load server config: %v", err)
 	} else {
 		log.Debug("Loaded server configurations.")
 	}
@@ -73,7 +73,7 @@ func main() {
 		log.Debug("Loaded server environment configurations.")
 	}
 
-	if envConfig.Debug{
+	if envConfig.Debug {
 		log = utils.Log(true)
 	}
 
@@ -91,7 +91,7 @@ func main() {
 
 	err = http.ListenAndServe(hostname, router)
 	if err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		log.Errorf("Failed to start server: %v", err)
 	}
 }
 
@@ -100,7 +100,7 @@ func retryDatabaseConnection(configPath string) error {
 	for attempt := 1; attempt <= maxRetries; attempt++ {
 		if err := CheckDatabaseConnection(configPath); err != nil {
 			if attempt < maxRetries {
-				log.Warn("Failed to connect to database. Retrying in 3 seconds... (Attempt %d/%d)", attempt, maxRetries)
+				log.Warnf("Failed to connect to database. Retrying in 3 seconds... (Attempt %d/%d)", attempt, maxRetries)
 				time.Sleep(3 * time.Second)
 				continue
 			}
@@ -124,7 +124,6 @@ func loadRoutes(environmentConfig struct {
 	EquipmentAssignmentAPIService := service.NewEquipmentAssignmentAPIService()
 	UserAPIService := service.NewUserAPIService()
 	log.Debug("Loaded API Services")
-
 
 	DefaultAPIController := api.NewDefaultAPIController(DefaultAPIService)
 	BusinessUnitAPIController := api.NewBusinessUnitAPIController(BusinessUnitAPIService)

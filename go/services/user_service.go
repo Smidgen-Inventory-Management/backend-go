@@ -52,7 +52,7 @@ func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.I
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.InsertRow("user_table", user)
@@ -68,7 +68,7 @@ func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.Im
 	privilege := "delete"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.DeleteRow("user_table", "userid", userId)
@@ -86,7 +86,7 @@ func (s *UserAPIService) GetUser(ctx context.Context) (utils.ImplResponse, error
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	var dest models.User
@@ -118,7 +118,7 @@ func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.I
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	var dest models.User
@@ -141,7 +141,7 @@ func (s *UserAPIService) UpdateUser(ctx context.Context, userId int32, user mode
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.UpdateRow("user_table", "userid", userId, user)
