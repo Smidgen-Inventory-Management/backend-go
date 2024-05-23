@@ -27,16 +27,21 @@ package smidgen
 
 import (
 	"context"
-	"errors"
-	"net/http"
 	api "smidgen-backend/go/api"
 	utils "smidgen-backend/go/utils"
+	"time"
 )
 
 // DefaultAPIService is a service that implements the logic for the DefaultAPIServicer
 // This service should implement the business logic for every endpoint for the DefaultAPI API.
 // Include any external packages or services that will be required by this service.
 type DefaultAPIService struct {
+}
+
+type healthCheck struct {
+	Service string        `json:"service"`
+	Status  string        `json:"status"`
+	Latency time.Duration `json:"latency"`
 }
 
 // NewDefaultAPIService creates a default api service
@@ -46,49 +51,46 @@ func NewDefaultAPIService() api.DefaultAPIServicer {
 
 // CheckHealthcheckGet - Check
 func (s *DefaultAPIService) CheckHealthcheckGet(ctx context.Context) (utils.ImplResponse, error) {
-	// TODO - update CheckHealthcheckGet with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	log.Debug("checking status of core Smidgen services")
+	healthcheckStart := time.Now()
+	var services []healthCheck
+	db, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "read")
+	if err != nil {
+		log.Fatalf("failed to create database connection: %v", err)
+		services = append(services, healthCheck{"Database", "DOWN", -1})
+		return utils.Response(500, "Failed to connect to database"), nil
+	}
+	defer func() {
+		if db != nil {
+			db.Close()
+		}
+	}()
 
-	// TODO: Uncomment the next line to return response utils.Response(200, interface{}{}) or use other options such as http.Ok ...
-	// return utils.Response(200, interface{}{}), nil
+	if db == nil {
+		log.Fatalf("database connection is nil")
+		services = append(services, healthCheck{"Database", "DEGREDADED", -1})
+		return utils.Response(500, "Failed to connect to database"), nil
+	}
 
-	// TODO: Uncomment the next line to return response utils.Response(404, {}) or use other options such as http.Ok ...
-	// return utils.Response(404, nil),nil
+	start := time.Now()
+	err = db.Ping()
+	latency := time.Since(start)
 
-	// TODO: Uncomment the next line to return response utils.Response(401, {}) or use other options such as http.Ok ...
-	// return utils.Response(401, nil),nil
+	if err != nil {
+		log.Fatalf("failed to ping database: %v", err)
+		services = append(services, healthCheck{"Database", "DEGREDADED", -1})
+		return utils.Response(500, "Failed to connect to database"), nil
+	}
 
-	// TODO: Uncomment the next line to return response utils.Response(403, {}) or use other options such as http.Ok ...
-	// return utils.Response(403, nil),nil
+	log.Infof("connection to database successfully established in %s", latency)
 
-	// TODO: Uncomment the next line to return response utils.Response(500, {}) or use other options such as http.Ok ...
-	// return utils.Response(500, nil),nil
-
-	// TODO: Uncomment the next line to return response utils.Response(501, {}) or use other options such as http.Ok ...
-	// return utils.Response(501, nil),nil
-
-	return utils.Response(http.StatusNotImplemented, nil), errors.New("CheckHealthcheckGet method not implemented")
+	healthcheckEnd := time.Since(healthcheckStart)
+	services = append(services, healthCheck{"API Server", "OK", healthcheckEnd})
+	services = append(services, healthCheck{"Database", "OK", latency})
+	return utils.Response(200, services), nil
 }
 
 // RootGet - Root
 func (s *DefaultAPIService) RootGet(ctx context.Context) (utils.ImplResponse, error) {
-	// TODO - update RootGet with the required logic for this service method.
-	// Add api_default_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
-
-	// TODO: Uncomment the next line to return response utils.Response(200, interface{}{}) or use other options such as http.Ok ...
-	// return utils.Response(200, interface{}{}), nil
-
-	// TODO: Uncomment the next line to return response utils.Response(404, {}) or use other options such as http.Ok ...
-	// return utils.Response(404, nil),nil
-
-	// TODO: Uncomment the next line to return response utils.Response(401, {}) or use other options such as http.Ok ...
-	// return utils.Response(401, nil),nil
-
-	// TODO: Uncomment the next line to return response utils.Response(403, {}) or use other options such as http.Ok ...
-	// return utils.Response(403, nil),nil
-
-	// TODO: Uncomment the next line to return response utils.Response(500, {}) or use other options such as http.Ok ...
-	// return utils.Response(500, nil),nil
-
-	return utils.Response(http.StatusNotImplemented, nil), errors.New("RootGet method not implemented")
+	return utils.Response(403, nil),nil
 }
