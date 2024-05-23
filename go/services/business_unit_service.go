@@ -55,7 +55,7 @@ func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUn
 
 	err = dbConnection.InsertRow("businessunit", businessUnit)
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
 	}
 	return utils.Response(202, nil), nil
@@ -71,8 +71,8 @@ func (s *BusinessUnitAPIService) DeleteBusinessUnit(ctx context.Context, unitId 
 
 	err = dbConnection.DeleteRow("businessUnit", "UnitID", unitId)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return utils.Response(500, nil), err
+		log.Errorf("Error: %v", err)
+		return utils.Response(404, nil), err
 	}
 
 	return utils.Response(200, nil), nil
@@ -89,16 +89,20 @@ func (s *BusinessUnitAPIService) GetBusinessUnit(ctx context.Context) (utils.Imp
 
 	var dest models.BusinessUnit
 	rows, err := dbConnection.GetRows("businessUnit", &dest)
-	if err != nil {
-		fmt.Println("Error:", err)
 
+	if err != nil {
+		log.Errorf("Error: %v", err)
+	}
+
+	if len(rows) <= 0 {
+		return utils.Response(404, nil), fmt.Errorf("no users were found in the database")
 	}
 
 	var businessUnits []models.BusinessUnit
 	for _, row := range rows {
 		businessUnit, ok := row.(models.BusinessUnit)
 		if !ok {
-			fmt.Println("Error: Unexpected type in row")
+			log.Warn("Warn: Unexpected type in row")
 			continue
 		}
 		businessUnits = append(businessUnits, businessUnit)
@@ -118,19 +122,19 @@ func (s *BusinessUnitAPIService) GetBusinessUnitById(ctx context.Context, unitId
 	var dest models.BusinessUnit
 	row, err := dbConnection.GetByID("businessUnit", "unitid", unitId, &dest)
 	if err != nil {
-		fmt.Println("Data Not Found:", err)
+		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
 	}
 
 	unit, ok := row.(models.BusinessUnit)
 	if !ok {
-		fmt.Println("Error: Unexpected type in row")
+		log.Warn("Warn: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
 	return utils.Response(200, unit), nil
 }
 
-// UpdateBusinessUnit - Update Business Unit
+// UpdateB  usinessUnit - Update Business Unit
 func (s *BusinessUnitAPIService) UpdateBusinessUnit(ctx context.Context, unitId int32, businessUnit models.BusinessUnit) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
@@ -140,8 +144,8 @@ func (s *BusinessUnitAPIService) UpdateBusinessUnit(ctx context.Context, unitId 
 
 	err = dbConnection.UpdateRow("businessUnit", "unitid", unitId, businessUnit)
 	if err != nil {
-		fmt.Println(err)
-		return utils.Response(500, nil), errors.New("an error has occured while updating the data")
+		log.Error(err)
+		return utils.Response(400, nil), err
 	}
 	return utils.Response(202, nil), nil
 }
