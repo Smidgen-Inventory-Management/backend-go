@@ -58,7 +58,7 @@ func (s *EquipmentAPIService) AddEquipment(ctx context.Context, equipment models
 	err = dbConnection.InsertRow("equipment", equipment)
 	if err != nil {
 		if err.Error() == "23503" {
-			fmt.Println("unable to insert new data. The data requires reference to another table (foreign key constraint)")
+			log.Error("unable to insert new data. The data requires reference to another table (foreign key constraint)")
 			return utils.Response(400, nil), errors.New("the BusinessUnit with ID of " + strconv.Itoa(int(equipment.BusinessUnitId)) + " does not exist")
 		}
 		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
@@ -76,8 +76,8 @@ func (s *EquipmentAPIService) DeleteEquipment(ctx context.Context, equipmentId i
 
 	err = dbConnection.DeleteRow("equipment", "EquipmentID", equipmentId)
 	if err != nil {
-		fmt.Println("Error:", err)
-		return utils.Response(500, nil), err
+		log.Errorf("Error: %v", err)
+		return utils.Response(404, nil), err
 	}
 
 	return utils.Response(200, nil), nil
@@ -95,15 +95,16 @@ func (s *EquipmentAPIService) GetEquipment(ctx context.Context) (utils.ImplRespo
 	var dest models.Equipment
 	rows, err := dbConnection.GetRows("equipment", &dest)
 	if err != nil {
-		fmt.Println("Error:", err)
-
+		log.Errorf("Error: %v", err)
 	}
-
+	if len(rows) <= 0 {
+		return utils.Response(404, nil), fmt.Errorf("no equipment was found in the database")
+	}
 	var Assets []models.Equipment
 	for _, row := range rows {
 		equipment, ok := row.(models.Equipment)
 		if !ok {
-			fmt.Println("Error: Unexpected type in row")
+			log.Error("Error: Unexpected type in row")
 			continue
 		}
 		Assets = append(Assets, equipment)
@@ -123,13 +124,13 @@ func (s *EquipmentAPIService) GetEquipmentById(ctx context.Context, equipmentId 
 	var dest models.Equipment
 	row, err := dbConnection.GetByID("equipment", "equipmentId", equipmentId, &dest)
 	if err != nil {
-		fmt.Println("Data Not Found:", err)
+		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
 	}
 
 	equipment, ok := row.(models.Equipment)
 	if !ok {
-		fmt.Println("Error: Unexpected type in row")
+		log.Error("Error: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
 	return utils.Response(200, equipment), nil
@@ -145,8 +146,8 @@ func (s *EquipmentAPIService) UpdateEquipment(ctx context.Context, equipmentId i
 
 	err = dbConnection.UpdateRow("equipment", "equipmentid", equipmentId, equipment)
 	if err != nil {
-		fmt.Println(err)
-		return utils.Response(500, nil), errors.New("an error has occured while updating the data")
+		log.Error(err)
+		return utils.Response(400, nil), err
 	}
 	return utils.Response(202, nil), nil
 }

@@ -46,7 +46,6 @@ func AssertBusinessUnitRequired(obj BusinessUnit) error {
 		"name":             obj.Name,
 		"point_of_contact": obj.PointOfContact,
 		"address_line_one": obj.AddressLineOne,
-		"address_line_two": obj.AddressLineTwo,
 		"state":            obj.State,
 		"city":             obj.City,
 		"country":          obj.Country,
