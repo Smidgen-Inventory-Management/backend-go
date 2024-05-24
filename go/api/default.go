@@ -79,7 +79,7 @@ func (c *DefaultAPIController) Routes() utils.Routes {
 
 // CheckHealthcheckGet - Check
 func (c *DefaultAPIController) CheckHealthcheckGet(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.CheckHealthcheckGet(r.Context())
+	result, err := c.service.HealthCheck(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

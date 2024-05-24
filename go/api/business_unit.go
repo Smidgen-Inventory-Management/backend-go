@@ -146,7 +146,7 @@ func (c *BusinessUnitAPIController) DeletBusinessUnit(w http.ResponseWriter, r *
 
 // GetBusinessUnit - Get Business Units
 func (c *BusinessUnitAPIController) GetBusinessUnit(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetBusinessUnit(r.Context())
+	result, err := c.service.GetBusinessUnits(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

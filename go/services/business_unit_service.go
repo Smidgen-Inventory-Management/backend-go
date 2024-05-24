@@ -78,8 +78,8 @@ func (s *BusinessUnitAPIService) DeleteBusinessUnit(ctx context.Context, unitId 
 	return utils.Response(200, nil), nil
 }
 
-// GetBusinessUnit - Get Business Units
-func (s *BusinessUnitAPIService) GetBusinessUnit(ctx context.Context) (utils.ImplResponse, error) {
+// GetBusinessUnits - Get Business Units
+func (s *BusinessUnitAPIService) GetBusinessUnits(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
@@ -94,7 +94,6 @@ func (s *BusinessUnitAPIService) GetBusinessUnit(ctx context.Context) (utils.Imp
 		log.Errorf("Error: %v", err)
 	}
 
-	
 	if len(rows) == 0 {
 		return utils.Response(404, nil), fmt.Errorf("no users were found in the database")
 	}

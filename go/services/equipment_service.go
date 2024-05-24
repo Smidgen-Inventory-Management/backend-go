@@ -83,8 +83,8 @@ func (s *EquipmentAPIService) DeleteEquipment(ctx context.Context, equipmentId i
 	return utils.Response(200, nil), nil
 }
 
-// GetEquipment - Get equipments
-func (s *EquipmentAPIService) GetEquipment(ctx context.Context) (utils.ImplResponse, error) {
+// GetEquipments - Get equipments
+func (s *EquipmentAPIService) GetEquipments(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)

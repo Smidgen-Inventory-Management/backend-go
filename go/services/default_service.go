@@ -49,8 +49,8 @@ func NewDefaultAPIService() api.DefaultAPIServicer {
 	return &DefaultAPIService{}
 }
 
-// CheckHealthcheckGet - Check
-func (s *DefaultAPIService) CheckHealthcheckGet(ctx context.Context) (utils.ImplResponse, error) {
+// HealthCheck - Check
+func (s *DefaultAPIService) HealthCheck(ctx context.Context) (utils.ImplResponse, error) {
 	log.Debug("checking status of core Smidgen services")
 	healthcheckStart := time.Now()
 	var services []healthCheck

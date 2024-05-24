@@ -146,7 +146,7 @@ func (c *EquipmentAPIController) DeleteEquipment(w http.ResponseWriter, r *http.
 
 // GetEquipment - Get equipments
 func (c *EquipmentAPIController) GetEquipment(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetEquipment(r.Context())
+	result, err := c.service.GetEquipments(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

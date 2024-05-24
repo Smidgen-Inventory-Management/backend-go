@@ -146,7 +146,7 @@ func (c *UserAPIController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 // GetUser - Get Users
 func (c *UserAPIController) GetUser(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetUser(r.Context())
+	result, err := c.service.GetUsers(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

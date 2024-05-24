@@ -146,7 +146,7 @@ func (c *EquipmentAssignmentAPIController) DeleteEquipmentAssignment(w http.Resp
 
 // GetEquipmentAssignment - Get assignments
 func (c *EquipmentAssignmentAPIController) GetEquipmentAssignment(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetEquipmentAssignment(r.Context())
+	result, err := c.service.GetEquipmentAssignments(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

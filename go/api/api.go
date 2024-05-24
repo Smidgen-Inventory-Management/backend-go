@@ -38,7 +38,7 @@ import (
 type BusinessUnitAPIRouter interface {
 	AddBusinessUnit(http.ResponseWriter, *http.Request)
 	DeleteBusinessUnitById(http.ResponseWriter, *http.Request)
-	GetBusinessUnit(http.ResponseWriter, *http.Request)
+	GetBusinessUnits(http.ResponseWriter, *http.Request)
 	GetBusinessUnitById(http.ResponseWriter, *http.Request)
 	UpdateBusinessUnit(http.ResponseWriter, *http.Request)
 	GetUserAssignmentsById(http.ResponseWriter, *http.Request)
@@ -48,7 +48,7 @@ type BusinessUnitAPIRouter interface {
 // The DefaultAPIRouter implementation should parse necessary information from the http request,
 // pass the data to a DefaultAPIServicer to perform the required actions, then write the service results to the http response.
 type DefaultAPIRouter interface {
-	CheckHealthcheckGet(http.ResponseWriter, *http.Request)
+	HealthCheck(http.ResponseWriter, *http.Request)
 	RootGet(http.ResponseWriter, *http.Request)
 }
 
@@ -58,7 +58,7 @@ type DefaultAPIRouter interface {
 type EquipmentAPIRouter interface {
 	AddEquipment(http.ResponseWriter, *http.Request)
 	DeleteEquipment(http.ResponseWriter, *http.Request)
-	GetEquipment(http.ResponseWriter, *http.Request)
+	GetEquipments(http.ResponseWriter, *http.Request)
 	GetEquipmentById(http.ResponseWriter, *http.Request)
 	UpdateEquipment(http.ResponseWriter, *http.Request)
 }
@@ -69,7 +69,7 @@ type EquipmentAPIRouter interface {
 type EquipmentAssignmentAPIRouter interface {
 	AddEquipmentAssignment(http.ResponseWriter, *http.Request)
 	DeleteEquipmentAssignment(http.ResponseWriter, *http.Request)
-	GetEquipmentAssignment(http.ResponseWriter, *http.Request)
+	GetEquipmentAssignments(http.ResponseWriter, *http.Request)
 	GetEquipmentAssignmentById(http.ResponseWriter, *http.Request)
 	UpdateEquipmentAssignment(http.ResponseWriter, *http.Request)
 }
@@ -80,7 +80,7 @@ type EquipmentAssignmentAPIRouter interface {
 type UserAPIRouter interface {
 	AddUser(http.ResponseWriter, *http.Request)
 	DeleteUser(http.ResponseWriter, *http.Request)
-	GetUser(http.ResponseWriter, *http.Request)
+	GetUsers(http.ResponseWriter, *http.Request)
 	GetUserById(http.ResponseWriter, *http.Request)
 	UpdateUser(http.ResponseWriter, *http.Request)
 }
@@ -92,7 +92,7 @@ type UserAPIRouter interface {
 type BusinessUnitAPIServicer interface {
 	AddBusinessUnit(context.Context, models.BusinessUnit) (utils.ImplResponse, error)
 	DeleteBusinessUnit(context.Context, int32) (utils.ImplResponse, error)
-	GetBusinessUnit(context.Context) (utils.ImplResponse, error)
+	GetBusinessUnits(context.Context) (utils.ImplResponse, error)
 	GetBusinessUnitById(context.Context, int32) (utils.ImplResponse, error)
 	UpdateBusinessUnit(context.Context, int32, models.BusinessUnit) (utils.ImplResponse, error)
 }
@@ -102,7 +102,7 @@ type BusinessUnitAPIServicer interface {
 // while the service implementation can be ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
 type DefaultAPIServicer interface {
-	CheckHealthcheckGet(context.Context) (utils.ImplResponse, error)
+	HealthCheck(context.Context) (utils.ImplResponse, error)
 	RootGet(context.Context) (utils.ImplResponse, error)
 }
 
@@ -113,7 +113,7 @@ type DefaultAPIServicer interface {
 type EquipmentAPIServicer interface {
 	AddEquipment(context.Context, models.Equipment) (utils.ImplResponse, error)
 	DeleteEquipment(context.Context, int32) (utils.ImplResponse, error)
-	GetEquipment(context.Context) (utils.ImplResponse, error)
+	GetEquipments(context.Context) (utils.ImplResponse, error)
 	GetEquipmentById(context.Context, int32) (utils.ImplResponse, error)
 	UpdateEquipment(context.Context, int32, models.Equipment) (utils.ImplResponse, error)
 }
@@ -125,7 +125,7 @@ type EquipmentAPIServicer interface {
 type EquipmentAssignmentAPIServicer interface {
 	AddEquipmentAssignment(context.Context, models.EquipmentAssignment) (utils.ImplResponse, error)
 	DeleteEquipmentAssignment(context.Context, int32) (utils.ImplResponse, error)
-	GetEquipmentAssignment(context.Context) (utils.ImplResponse, error)
+	GetEquipmentAssignments(context.Context) (utils.ImplResponse, error)
 	GetEquipmentAssignmentById(context.Context, int32) (utils.ImplResponse, error)
 	UpdateEquipmentAssignment(context.Context, int32, models.EquipmentAssignment) (utils.ImplResponse, error)
 }
@@ -137,7 +137,7 @@ type EquipmentAssignmentAPIServicer interface {
 type UserAPIServicer interface {
 	AddUser(context.Context, models.User) (utils.ImplResponse, error)
 	DeleteUser(context.Context, int32) (utils.ImplResponse, error)
-	GetUser(context.Context) (utils.ImplResponse, error)
+	GetUsers(context.Context) (utils.ImplResponse, error)
 	GetUserById(context.Context, int32) (utils.ImplResponse, error)
 	UpdateUser(context.Context, int32, models.User) (utils.ImplResponse, error)
 }

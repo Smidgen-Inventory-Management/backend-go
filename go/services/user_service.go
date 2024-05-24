@@ -80,8 +80,8 @@ func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.Im
 	return utils.Response(200, nil), nil
 }
 
-// GetUser - Get Users
-func (s *UserAPIService) GetUser(ctx context.Context) (utils.ImplResponse, error) {
+// GetUsers - Get Users
+func (s *UserAPIService) GetUsers(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
