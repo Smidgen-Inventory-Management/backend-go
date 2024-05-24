@@ -32,11 +32,8 @@ import (
 
 type EquipmentAssignment struct {
 	AssignmentId int32 `json:"assignment_id"`
-
 	UserId int32 `json:"user_id"`
-
 	EquipmentId int32 `json:"equipment_id"`
-
 	DateOfAssignment time.Time `json:"date_of_assignment"`
 }
 

@@ -31,9 +31,7 @@ import (
 
 type ValidationError struct {
 	Loc []LocationInner `json:"loc"`
-
 	Msg string `json:"msg"`
-
 	Type string `json:"type"`
 }
 

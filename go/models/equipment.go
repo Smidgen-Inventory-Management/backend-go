@@ -32,17 +32,11 @@ import (
 
 type Equipment struct {
 	EquipmentId int32 `json:"equipment_id"`
-
 	BusinessUnitId int32 `json:"business_unit_id"`
-
 	Manufacturer string `json:"manufacturer"`
-
 	Model string `json:"model"`
-
 	Description string `json:"description"`
-
 	DateReceived time.Time `json:"date_received"`
-
 	LastInventoried time.Time `json:"last_inventoried"`
 }
 
@@ -52,9 +46,7 @@ func AssertEquipmentRequired(obj Equipment) error {
 		"business_unit_id": obj.BusinessUnitId,
 		"manufacturer":     obj.Manufacturer,
 		"model":            obj.Model,
-		"description":      obj.Description,
 		"date_received":    obj.DateReceived,
-		"last_inventoried": obj.LastInventoried,
 	}
 	for name, el := range elements {
 		if isZero := utils.IsZeroValue(el); isZero {

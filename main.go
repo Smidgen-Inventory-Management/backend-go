@@ -45,38 +45,36 @@ var log = utils.Log()
 func main() {
 	_, err := os.Stat("configs")
 	dirExists := !os.IsNotExist(err)
-	argsLength := (len(os.Args) < 3)
+	argsLengthMoreThanTwo := (len(os.Args) == 3)
 
 	switch {
-	case !dirExists && argsLength:
+	case !dirExists && argsLengthMoreThanTwo:
 		log.Error("Path to configuration files not found. Ensure you have a \"configs\" directory, or run the server with the appropriate arguments.")
 		log.Error("Usage: go run main.go <path_to_server_configurations> <path_to_database_configurations>")
 		return
-	case dirExists:
-		utils.ServerConfigPath = "configs/server.yaml"
-		utils.DatabaseConfigPath = "configs/db_conn.yaml"
-	default:
+	case argsLengthMoreThanTwo:
 		utils.ServerConfigPath = os.Args[1]
 		utils.DatabaseConfigPath = os.Args[2]
+	default:
+		utils.ServerConfigPath = "configs/server.yaml"
+		utils.DatabaseConfigPath = "configs/db_conn.yaml"
 	}
 
 	serverConfig, err := LoadServerConfig(utils.ServerConfigPath)
 	if err != nil {
 		log.Errorf("Failed to load server config: %v", err)
 	} else {
-		log.Debug("Loaded server configurations.")
+		log.Info("Loaded server configurations.")
 	}
 
 	envConfig, ok := serverConfig.Environments["Development"]
 	if !ok {
 		log.Fatal("Environment configuration not found")
 	} else {
-		log.Debug("Loaded server environment configurations.")
+		log.Info("Loaded server environment configurations.")
 	}
 
-	if envConfig.Debug {
-		log = utils.Log(true)
-	}
+	log = utils.Log(envConfig.Debug)
 
 	if err := retryDatabaseConnection(utils.DatabaseConfigPath); err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
@@ -170,16 +168,16 @@ func loadRoutes(environmentConfig struct {
 	EquipmentAPIService := service.NewEquipmentAPIService()
 	EquipmentAssignmentAPIService := service.NewEquipmentAssignmentAPIService()
 	UserAPIService := service.NewUserAPIService()
-	log.Debug("Loaded API Services")
+	log.Debug("loaded API cervices")
 
 	DefaultAPIController := api.NewDefaultAPIController(DefaultAPIService)
 	BusinessUnitAPIController := api.NewBusinessUnitAPIController(BusinessUnitAPIService)
 	EquipmentAPIController := api.NewEquipmentAPIController(EquipmentAPIService)
 	EquipmentAssignmentAPIController := api.NewEquipmentAssignmentAPIController(EquipmentAssignmentAPIService)
 	UserAPIController := api.NewUserAPIController(UserAPIService)
-	log.Debug("Loaded API Controllers")
+	log.Debug("loaded API controllers")
 
 	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController)
-
+	log.Debug("successfully created routters")
 	return router
 }
