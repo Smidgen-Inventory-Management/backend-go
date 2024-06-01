@@ -28,8 +28,8 @@ package smidgen
 import (
 	"encoding/json"
 	"net/http"
-	models "smidgen-backend/go/models"
-	utils "smidgen-backend/go/utils"
+	models "smidgen-backend/src/models"
+	utils "smidgen-backend/src/utils"
 	"strings"
 
 	"github.com/gorilla/mux"

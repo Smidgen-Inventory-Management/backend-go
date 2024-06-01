@@ -7,7 +7,6 @@
  *   conduct on a daily basis so they can focus on the effective distribution
  *   of materiel, as well as maintain an accurate record keeping book of
  *   receiving, issuance, audits, surpluses, amongst other logistical tasks.
-
  *   Copyright (C) 2024  Jose Hernandez
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -27,28 +26,23 @@
 package smidgen
 
 import (
-	utils "smidgen-backend/go/utils"
+	utils "smidgen-backend/src/utils"
+	"time"
 )
 
-type BusinessUnit struct {
-	UnitId         int32  `json:"unit_id"`
-	Name           string `json:"name"`
-	PointOfContact string `json:"point_of_contact"`
-	AddressLineOne string `json:"address_line_one"`
-	AddressLineTwo string `json:"address_line_two"`
-	State          string `json:"state"`
-	City           string `json:"city"`
-	Country        string `json:"country"`
+type EquipmentAssignment struct {
+	AssignmentId int32 `json:"assignment_id"`
+	UserId int32 `json:"user_id"`
+	EquipmentId int32 `json:"equipment_id"`
+	DateOfAssignment time.Time `json:"date_of_assignment"`
 }
 
-func AssertBusinessUnitRequired(obj BusinessUnit) error {
+func AssertEquipmentAssignmentRequired(obj EquipmentAssignment) error {
 	elements := map[string]interface{}{
-		"name":             obj.Name,
-		"point_of_contact": obj.PointOfContact,
-		"address_line_one": obj.AddressLineOne,
-		"state":            obj.State,
-		"city":             obj.City,
-		"country":          obj.Country,
+		"assignment_id":      obj.AssignmentId,
+		"user_id":            obj.UserId,
+		"equipment_id":       obj.EquipmentId,
+		"date_of_assignment": obj.DateOfAssignment,
 	}
 	for name, el := range elements {
 		if isZero := utils.IsZeroValue(el); isZero {
@@ -59,6 +53,6 @@ func AssertBusinessUnitRequired(obj BusinessUnit) error {
 	return nil
 }
 
-func AssertBusinessUnitConstraints(obj BusinessUnit) error {
+func AssertEquipmentAssignmentConstraints(obj EquipmentAssignment) error {
 	return nil
 }

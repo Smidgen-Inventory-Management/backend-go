@@ -26,23 +26,21 @@
 package smidgen
 
 import (
-	utils "smidgen-backend/go/utils"
-	"time"
+	utils "smidgen-backend/src/utils"
 )
 
-type EquipmentAssignment struct {
-	AssignmentId int32 `json:"assignment_id"`
-	UserId int32 `json:"user_id"`
-	EquipmentId int32 `json:"equipment_id"`
-	DateOfAssignment time.Time `json:"date_of_assignment"`
+type ValidationError struct {
+	Loc []LocationInner `json:"loc"`
+	Msg string `json:"msg"`
+	Type string `json:"type"`
 }
 
-func AssertEquipmentAssignmentRequired(obj EquipmentAssignment) error {
+// AssertValidationErrorRequired checks if the required fields are not zero-ed
+func AssertValidationErrorRequired(obj ValidationError) error {
 	elements := map[string]interface{}{
-		"assignment_id":      obj.AssignmentId,
-		"user_id":            obj.UserId,
-		"equipment_id":       obj.EquipmentId,
-		"date_of_assignment": obj.DateOfAssignment,
+		"loc":  obj.Loc,
+		"msg":  obj.Msg,
+		"type": obj.Type,
 	}
 	for name, el := range elements {
 		if isZero := utils.IsZeroValue(el); isZero {
@@ -50,9 +48,15 @@ func AssertEquipmentAssignmentRequired(obj EquipmentAssignment) error {
 		}
 	}
 
+	for _, el := range obj.Loc {
+		if err := AssertLocationInnerRequired(el); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
-func AssertEquipmentAssignmentConstraints(obj EquipmentAssignment) error {
+// AssertValidationErrorConstraints checks if the values respects the defined constraints
+func AssertValidationErrorConstraints(obj ValidationError) error {
 	return nil
 }

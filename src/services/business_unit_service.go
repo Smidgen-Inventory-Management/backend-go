@@ -29,9 +29,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	api "smidgen-backend/go/api"
-	models "smidgen-backend/go/models"
-	utils "smidgen-backend/go/utils"
+	api "smidgen-backend/src/api"
+	models "smidgen-backend/src/models"
+	utils "smidgen-backend/src/utils"
 )
 
 // BusinessUnitAPIService is a service that implements the logic for the BusinessUnitAPIServicer

@@ -28,32 +28,32 @@ package smidgen
 import (
 	"encoding/json"
 	"net/http"
-	models "smidgen-backend/go/models"
-	utils "smidgen-backend/go/utils"
+	models "smidgen-backend/src/models"
+	utils "smidgen-backend/src/utils"
 	"strings"
 
 	"github.com/gorilla/mux"
 )
 
-// BusinessUnitAPIController binds http requests to an api service and writes the service results to the http response
-type BusinessUnitAPIController struct {
-	service      BusinessUnitAPIServicer
+// UserAPIController binds http requests to an api service and writes the service results to the http response
+type UserAPIController struct {
+	service      UserAPIServicer
 	errorHandler utils.ErrorHandler
 }
 
-// BusinessUnitAPIOption for how the controller is set up.
-type BusinessUnitAPIOption func(*BusinessUnitAPIController)
+// UserAPIOption for how the controller is set up.
+type UserAPIOption func(*UserAPIController)
 
-// WithBusinessUnitAPIErrorHandler inject ErrorHandler into controller
-func WithBusinessUnitAPIErrorHandler(h utils.ErrorHandler) BusinessUnitAPIOption {
-	return func(c *BusinessUnitAPIController) {
+// WithUserAPIErrorHandler inject ErrorHandler into controller
+func WithUserAPIErrorHandler(h utils.ErrorHandler) UserAPIOption {
+	return func(c *UserAPIController) {
 		c.errorHandler = h
 	}
 }
 
-// NewBusinessUnitAPIController creates a default api controller
-func NewBusinessUnitAPIController(s BusinessUnitAPIServicer, opts ...BusinessUnitAPIOption) utils.Router {
-	controller := &BusinessUnitAPIController{
+// NewUserAPIController creates a default api controller
+func NewUserAPIController(s UserAPIServicer, opts ...UserAPIOption) utils.Router {
+	controller := &UserAPIController{
 		service:      s,
 		errorHandler: utils.DefaultErrorHandler,
 	}
@@ -65,55 +65,55 @@ func NewBusinessUnitAPIController(s BusinessUnitAPIServicer, opts ...BusinessUni
 	return controller
 }
 
-// Routes returns all the api routes for the BusinessUnitAPIController
-func (c *BusinessUnitAPIController) Routes() utils.Routes {
+// utils.Routes returns all the api utils.routes for the UserAPIController
+func (c *UserAPIController) Routes() utils.Routes {
 	return utils.Routes{
-		"AddBusinessUnit": utils.Route{
+		"AddUser": utils.Route{
 			Method:      strings.ToUpper("Post"),
-			Pattern:     "business_unit",
-			HandlerFunc: c.AddBusinessUnit,
+			Pattern:     "user",
+			HandlerFunc: c.AddUser,
 		},
-		"DeletBusinessUnit": utils.Route{
+		"DeleteUser": utils.Route{
 			Method:      strings.ToUpper("Delete"),
-			Pattern:     "business_unit/{unit_id}",
-			HandlerFunc: c.DeletBusinessUnit,
+			Pattern:     "user/{user_id}",
+			HandlerFunc: c.DeleteUser,
 		},
-		"GetBusinessUnit": utils.Route{
+		"GetUser": utils.Route{
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "business_unit/",
-			HandlerFunc: c.GetBusinessUnit,
+			Pattern:     "user/",
+			HandlerFunc: c.GetUser,
 		},
-		"GetBusinessUnitById": utils.Route{
+		"GetUserById": utils.Route{
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "business_unit/{unit_id}",
-			HandlerFunc: c.GetBusinessUnitById,
+			Pattern:     "user/{user_id}",
+			HandlerFunc: c.GetUserById,
 		},
-		"UpdateBusinessUnit": utils.Route{
+		"UpdateUser": utils.Route{
 			Method:      strings.ToUpper("Put"),
-			Pattern:     "business_unit/{unit_id}",
-			HandlerFunc: c.UpdateBusinessUnit,
+			Pattern:     "user/{user_id}",
+			HandlerFunc: c.UpdateUser,
 		},
 	}
 }
 
-// AddBusinessUnit - Create Business Unit
-func (c *BusinessUnitAPIController) AddBusinessUnit(w http.ResponseWriter, r *http.Request) {
-	businessUnitParam := models.BusinessUnit{}
+// AddUser - Create user
+func (c *UserAPIController) AddUser(w http.ResponseWriter, r *http.Request) {
+	userParam := models.User{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&businessUnitParam); err != nil {
+	if err := d.Decode(&userParam); err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := models.AssertBusinessUnitRequired(businessUnitParam); err != nil {
+	if err := models.AssertUserRequired(userParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := models.AssertBusinessUnitConstraints(businessUnitParam); err != nil {
+	if err := models.AssertUserConstraints(userParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.AddBusinessUnit(r.Context(), businessUnitParam)
+	result, err := c.service.AddUser(r.Context(), userParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -123,18 +123,18 @@ func (c *BusinessUnitAPIController) AddBusinessUnit(w http.ResponseWriter, r *ht
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// DeletBusinessUnit - Delete Business Unit
-func (c *BusinessUnitAPIController) DeletBusinessUnit(w http.ResponseWriter, r *http.Request) {
+// DeleteUser - Delete user
+func (c *UserAPIController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	unitIdParam, err := utils.ParseNumericParameter[int32](
-		params["unit_id"],
+	userIdParam, err := utils.ParseNumericParameter[int32](
+		params["user_id"],
 		utils.WithRequire[int32](utils.ParseInt32),
 	)
 	if err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.DeleteBusinessUnit(r.Context(), unitIdParam)
+	result, err := c.service.DeleteUser(r.Context(), userIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -144,9 +144,9 @@ func (c *BusinessUnitAPIController) DeletBusinessUnit(w http.ResponseWriter, r *
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetBusinessUnit - Get Business Units
-func (c *BusinessUnitAPIController) GetBusinessUnit(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetBusinessUnits(r.Context())
+// GetUser - Get Users
+func (c *UserAPIController) GetUser(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetUsers(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -156,18 +156,18 @@ func (c *BusinessUnitAPIController) GetBusinessUnit(w http.ResponseWriter, r *ht
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetBusinessUnitById - Get Business Unit
-func (c *BusinessUnitAPIController) GetBusinessUnitById(w http.ResponseWriter, r *http.Request) {
+// GetUserById - Get user
+func (c *UserAPIController) GetUserById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	unitIdParam, err := utils.ParseNumericParameter[int32](
-		params["unit_id"],
+	userIdParam, err := utils.ParseNumericParameter[int32](
+		params["user_id"],
 		utils.WithRequire[int32](utils.ParseInt32),
 	)
 	if err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetBusinessUnitById(r.Context(), unitIdParam)
+	result, err := c.service.GetUserById(r.Context(), userIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -177,33 +177,33 @@ func (c *BusinessUnitAPIController) GetBusinessUnitById(w http.ResponseWriter, r
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// UpdateBusinessUnit - Update Business Unit
-func (c *BusinessUnitAPIController) UpdateBusinessUnit(w http.ResponseWriter, r *http.Request) {
+// UpdateUser - Update user
+func (c *UserAPIController) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	unitIdParam, err := utils.ParseNumericParameter[int32](
-		params["unit_id"],
+	userIdParam, err := utils.ParseNumericParameter[int32](
+		params["user_id"],
 		utils.WithRequire[int32](utils.ParseInt32),
 	)
 	if err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	businessUnitParam := models.BusinessUnit{}
+	userParam := models.User{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&businessUnitParam); err != nil {
+	if err := d.Decode(&userParam); err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := models.AssertBusinessUnitRequired(businessUnitParam); err != nil {
+	if err := models.AssertUserRequired(userParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := models.AssertBusinessUnitConstraints(businessUnitParam); err != nil {
+	if err := models.AssertUserConstraints(userParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateBusinessUnit(r.Context(), unitIdParam, businessUnitParam)
+	result, err := c.service.UpdateUser(r.Context(), userIdParam, userParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

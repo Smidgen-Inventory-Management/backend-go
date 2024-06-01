@@ -27,7 +27,7 @@ package smidgen
 
 import (
 	"database/sql"
-	utils "smidgen-backend/go/utils"
+	utils "smidgen-backend/src/utils"
 )
 
 type User struct {

@@ -27,7 +27,7 @@ package smidgen
 
 import (
 	"net/http"
-	utils "smidgen-backend/go/utils"
+	utils "smidgen-backend/src/utils"
 	"strings"
 )
 

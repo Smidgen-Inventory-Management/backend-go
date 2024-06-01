@@ -26,21 +26,27 @@
 package smidgen
 
 import (
-	utils "smidgen-backend/go/utils"
+	utils "smidgen-backend/src/utils"
+	"time"
 )
 
-type ValidationError struct {
-	Loc []LocationInner `json:"loc"`
-	Msg string `json:"msg"`
-	Type string `json:"type"`
+type Equipment struct {
+	EquipmentId int32 `json:"equipment_id"`
+	BusinessUnitId int32 `json:"business_unit_id"`
+	Manufacturer string `json:"manufacturer"`
+	Model string `json:"model"`
+	Description string `json:"description"`
+	DateReceived time.Time `json:"date_received"`
+	LastInventoried time.Time `json:"last_inventoried"`
 }
 
-// AssertValidationErrorRequired checks if the required fields are not zero-ed
-func AssertValidationErrorRequired(obj ValidationError) error {
+func AssertEquipmentRequired(obj Equipment) error {
 	elements := map[string]interface{}{
-		"loc":  obj.Loc,
-		"msg":  obj.Msg,
-		"type": obj.Type,
+		"equipment_id":     obj.EquipmentId,
+		"business_unit_id": obj.BusinessUnitId,
+		"manufacturer":     obj.Manufacturer,
+		"model":            obj.Model,
+		"date_received":    obj.DateReceived,
 	}
 	for name, el := range elements {
 		if isZero := utils.IsZeroValue(el); isZero {
@@ -48,15 +54,10 @@ func AssertValidationErrorRequired(obj ValidationError) error {
 		}
 	}
 
-	for _, el := range obj.Loc {
-		if err := AssertLocationInnerRequired(el); err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
-// AssertValidationErrorConstraints checks if the values respects the defined constraints
-func AssertValidationErrorConstraints(obj ValidationError) error {
+// AssertEquipmentConstraints checks if the values respects the defined constraints
+func AssertEquipmentConstraints(obj Equipment) error {
 	return nil
 }

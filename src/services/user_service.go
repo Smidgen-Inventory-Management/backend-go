@@ -29,31 +29,33 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	api "smidgen-backend/go/api"
-	models "smidgen-backend/go/models"
-	utils "smidgen-backend/go/utils"
+	api "smidgen-backend/src/api"
+	models "smidgen-backend/src/models"
+	utils "smidgen-backend/src/utils"
 )
 
-// EquipmentAssignmentAPIService is a service that implements the logic for the EquipmentAssignmentAPIServicer
-// This service should implement the business logic for every endpoint for the EquipmentAssignmentAPI API.
+var log = utils.Log()
+
+// UserAPIService is a service that implements the logic for the UserAPIServicer
+// This service should implement the business logic for every endpoint for the UserAPI API.
 // Include any external packages or services that will be required by this service.
-type EquipmentAssignmentAPIService struct {
+type UserAPIService struct {
 }
 
-// NewEquipmentAssignmentAPIService creates a default api service
-func NewEquipmentAssignmentAPIService() api.EquipmentAssignmentAPIServicer {
-	return &EquipmentAssignmentAPIService{}
+// NewUserAPIService creates a default api service
+func NewUserAPIService() api.UserAPIServicer {
+	return &UserAPIService{}
 }
 
-// AddEquipmentAssignment - Create assignment
-func (s *EquipmentAssignmentAPIService) AddEquipmentAssignment(ctx context.Context, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
+// AddUser - Create user
+func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.InsertRow("equipmentAssignment", equipmentAssignment)
+	err = dbConnection.InsertRow("smidgenUsers", user)
 	if err != nil {
 		log.Error(err)
 		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
@@ -61,15 +63,15 @@ func (s *EquipmentAssignmentAPIService) AddEquipmentAssignment(ctx context.Conte
 	return utils.Response(202, nil), nil
 }
 
-// DeleteEquipmentAssignment - Delete assignment
-func (s *EquipmentAssignmentAPIService) DeleteEquipmentAssignment(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
+// DeleteUser - Delete user
+func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.DeleteRow("equipment", "equipmentid", assignmentId)
+	err = dbConnection.DeleteRow("smidgenUsers", "userid", userId)
 	if err != nil {
 		log.Errorf("Error: %v", err)
 		return utils.Response(404, nil), err
@@ -78,8 +80,8 @@ func (s *EquipmentAssignmentAPIService) DeleteEquipmentAssignment(ctx context.Co
 	return utils.Response(200, nil), nil
 }
 
-// GetEquipmentAssignments - Get assignments
-func (s *EquipmentAssignmentAPIService) GetEquipmentAssignments(ctx context.Context) (utils.ImplResponse, error) {
+// GetUsers - Get Users
+func (s *UserAPIService) GetUsers(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
@@ -87,62 +89,62 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignments(ctx context.Cont
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	var dest models.EquipmentAssignment
-	rows, err := dbConnection.GetRows("equipmentAssignment", &dest)
+	var dest models.User
+	rows, err := dbConnection.GetRows("smidgenUsers", &dest)
 
 	if err != nil {
-		log.Error("Error: %v", err)
+		log.Errorf("Error: %v", err)
 	}
 
 	if len(rows) == 0 {
-		return utils.Response(404, nil), fmt.Errorf("no equipment assignments were found in the database")
+		return utils.Response(404, nil), fmt.Errorf("no users were found in the database")
 	}
 
-	var Assignments []models.EquipmentAssignment
+	var users []models.User
 	for _, row := range rows {
-		Assignment, ok := row.(models.EquipmentAssignment)
+		user, ok := row.(models.User)
 		if !ok {
 			log.Warn("Warn: Unexpected type in row")
 			continue
 		}
-		Assignments = append(Assignments, Assignment)
+		users = append(users, user)
 	}
 
-	return utils.Response(200, Assignments), nil
+	return utils.Response(200, users), nil
 }
 
-// GetEquipmnentAssignmentById - Get assignment
-func (s *EquipmentAssignmentAPIService) GetEquipmentAssignmentById(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
+// GetUserById - Get user
+func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.ImplResponse, error) {
 	privilege := "read"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	var dest models.Equipment
-	row, err := dbConnection.GetByID("equipmetnAssignment", "assignmentId", assignmentId, &dest)
+	var dest models.User
+	row, err := dbConnection.GetByID("smidgenUsers", "userId", userId, &dest)
 	if err != nil {
 		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
 	}
 
-	assignment, ok := row.(models.EquipmentAssignment)
+	user, ok := row.(models.User)
 	if !ok {
 		log.Warn("Warn: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
-	return utils.Response(200, assignment), nil
+	return utils.Response(200, user), nil
 }
 
-// UpdateEquipmentAssignment - Update assignment
-func (s *EquipmentAssignmentAPIService) UpdateEquipmentAssignment(ctx context.Context, assignmentId int32, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
+// UpdateUser - Update user
+func (s *UserAPIService) UpdateUser(ctx context.Context, userId int32, user models.User) (utils.ImplResponse, error) {
 	privilege := "write"
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.UpdateRow("equipmentAssignment", "assignmentid", assignmentId, equipmentAssignment)
+	err = dbConnection.UpdateRow("smidgenUsers", "userid", userId, user)
 	if err != nil {
 		log.Error(err)
 		return utils.Response(400, nil), err

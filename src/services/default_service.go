@@ -27,8 +27,8 @@ package smidgen
 
 import (
 	"context"
-	api "smidgen-backend/go/api"
-	utils "smidgen-backend/go/utils"
+	api "smidgen-backend/src/api"
+	utils "smidgen-backend/src/utils"
 	"time"
 )
 

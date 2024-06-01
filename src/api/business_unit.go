@@ -28,32 +28,32 @@ package smidgen
 import (
 	"encoding/json"
 	"net/http"
-	models "smidgen-backend/go/models"
-	utils "smidgen-backend/go/utils"
+	models "smidgen-backend/src/models"
+	utils "smidgen-backend/src/utils"
 	"strings"
 
 	"github.com/gorilla/mux"
 )
 
-// EquipmentAPIController binds http requests to an api service and writes the service results to the http response
-type EquipmentAPIController struct {
-	service      EquipmentAPIServicer
+// BusinessUnitAPIController binds http requests to an api service and writes the service results to the http response
+type BusinessUnitAPIController struct {
+	service      BusinessUnitAPIServicer
 	errorHandler utils.ErrorHandler
 }
 
-// EquipmentAPIOption for how the controller is set up.
-type EquipmentAPIOption func(*EquipmentAPIController)
+// BusinessUnitAPIOption for how the controller is set up.
+type BusinessUnitAPIOption func(*BusinessUnitAPIController)
 
-// WithEquipmentAPIErrorHandler inject ErrorHandler into controller
-func WithEquipmentAPIErrorHandler(h utils.ErrorHandler) EquipmentAPIOption {
-	return func(c *EquipmentAPIController) {
+// WithBusinessUnitAPIErrorHandler inject ErrorHandler into controller
+func WithBusinessUnitAPIErrorHandler(h utils.ErrorHandler) BusinessUnitAPIOption {
+	return func(c *BusinessUnitAPIController) {
 		c.errorHandler = h
 	}
 }
 
-// NewEquipmentAPIController creates a default api controller
-func NewEquipmentAPIController(s EquipmentAPIServicer, opts ...EquipmentAPIOption) utils.Router {
-	controller := &EquipmentAPIController{
+// NewBusinessUnitAPIController creates a default api controller
+func NewBusinessUnitAPIController(s BusinessUnitAPIServicer, opts ...BusinessUnitAPIOption) utils.Router {
+	controller := &BusinessUnitAPIController{
 		service:      s,
 		errorHandler: utils.DefaultErrorHandler,
 	}
@@ -65,55 +65,55 @@ func NewEquipmentAPIController(s EquipmentAPIServicer, opts ...EquipmentAPIOptio
 	return controller
 }
 
-// Routes returns all the api routes for the EquipmentAPIController
-func (c *EquipmentAPIController) Routes() utils.Routes {
+// Routes returns all the api routes for the BusinessUnitAPIController
+func (c *BusinessUnitAPIController) Routes() utils.Routes {
 	return utils.Routes{
-		"AddEquipment": utils.Route{
+		"AddBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Post"),
-			Pattern:     "equipment",
-			HandlerFunc: c.AddEquipment,
+			Pattern:     "business_unit",
+			HandlerFunc: c.AddBusinessUnit,
 		},
-		"DeleteEquipment": utils.Route{
+		"DeletBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Delete"),
-			Pattern:     "equipment/{equipment_id}",
-			HandlerFunc: c.DeleteEquipment,
+			Pattern:     "business_unit/{unit_id}",
+			HandlerFunc: c.DeletBusinessUnit,
 		},
-		"GetEquipment": utils.Route{
+		"GetBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "equipment/",
-			HandlerFunc: c.GetEquipment,
+			Pattern:     "business_unit/",
+			HandlerFunc: c.GetBusinessUnit,
 		},
-		"GetEquipmentById": utils.Route{
+		"GetBusinessUnitById": utils.Route{
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "equipment/{equipment_id}",
-			HandlerFunc: c.GetEquipmentById,
+			Pattern:     "business_unit/{unit_id}",
+			HandlerFunc: c.GetBusinessUnitById,
 		},
-		"UpdateEquipment": utils.Route{
+		"UpdateBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Put"),
-			Pattern:     "equipment/{equipment_id}",
-			HandlerFunc: c.UpdateEquipment,
+			Pattern:     "business_unit/{unit_id}",
+			HandlerFunc: c.UpdateBusinessUnit,
 		},
 	}
 }
 
-// AddEquipment - Create equipment
-func (c *EquipmentAPIController) AddEquipment(w http.ResponseWriter, r *http.Request) {
-	equipmentParam := models.Equipment{}
+// AddBusinessUnit - Create Business Unit
+func (c *BusinessUnitAPIController) AddBusinessUnit(w http.ResponseWriter, r *http.Request) {
+	businessUnitParam := models.BusinessUnit{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&equipmentParam); err != nil {
+	if err := d.Decode(&businessUnitParam); err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := models.AssertEquipmentRequired(equipmentParam); err != nil {
+	if err := models.AssertBusinessUnitRequired(businessUnitParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := models.AssertEquipmentConstraints(equipmentParam); err != nil {
+	if err := models.AssertBusinessUnitConstraints(businessUnitParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.AddEquipment(r.Context(), equipmentParam)
+	result, err := c.service.AddBusinessUnit(r.Context(), businessUnitParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -123,18 +123,18 @@ func (c *EquipmentAPIController) AddEquipment(w http.ResponseWriter, r *http.Req
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// DeleteEquipment - Delete equipment
-func (c *EquipmentAPIController) DeleteEquipment(w http.ResponseWriter, r *http.Request) {
+// DeletBusinessUnit - Delete Business Unit
+func (c *BusinessUnitAPIController) DeletBusinessUnit(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	equipmentIdParam, err := utils.ParseNumericParameter[int32](
-		params["equipment_id"],
+	unitIdParam, err := utils.ParseNumericParameter[int32](
+		params["unit_id"],
 		utils.WithRequire[int32](utils.ParseInt32),
 	)
 	if err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.DeleteEquipment(r.Context(), equipmentIdParam)
+	result, err := c.service.DeleteBusinessUnit(r.Context(), unitIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -144,9 +144,9 @@ func (c *EquipmentAPIController) DeleteEquipment(w http.ResponseWriter, r *http.
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetEquipment - Get equipments
-func (c *EquipmentAPIController) GetEquipment(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetEquipments(r.Context())
+// GetBusinessUnit - Get Business Units
+func (c *BusinessUnitAPIController) GetBusinessUnit(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetBusinessUnits(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -156,18 +156,18 @@ func (c *EquipmentAPIController) GetEquipment(w http.ResponseWriter, r *http.Req
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetEquipmentById - Get equipment
-func (c *EquipmentAPIController) GetEquipmentById(w http.ResponseWriter, r *http.Request) {
+// GetBusinessUnitById - Get Business Unit
+func (c *BusinessUnitAPIController) GetBusinessUnitById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	equipmentIdParam, err := utils.ParseNumericParameter[int32](
-		params["equipment_id"],
+	unitIdParam, err := utils.ParseNumericParameter[int32](
+		params["unit_id"],
 		utils.WithRequire[int32](utils.ParseInt32),
 	)
 	if err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetEquipmentById(r.Context(), equipmentIdParam)
+	result, err := c.service.GetBusinessUnitById(r.Context(), unitIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -177,33 +177,33 @@ func (c *EquipmentAPIController) GetEquipmentById(w http.ResponseWriter, r *http
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// UpdateEquipment - Update equipment
-func (c *EquipmentAPIController) UpdateEquipment(w http.ResponseWriter, r *http.Request) {
+// UpdateBusinessUnit - Update Business Unit
+func (c *BusinessUnitAPIController) UpdateBusinessUnit(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	equipmentIdParam, err := utils.ParseNumericParameter[int32](
-		params["equipment_id"],
+	unitIdParam, err := utils.ParseNumericParameter[int32](
+		params["unit_id"],
 		utils.WithRequire[int32](utils.ParseInt32),
 	)
 	if err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	equipmentParam := models.Equipment{}
+	businessUnitParam := models.BusinessUnit{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&equipmentParam); err != nil {
+	if err := d.Decode(&businessUnitParam); err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := models.AssertEquipmentRequired(equipmentParam); err != nil {
+	if err := models.AssertBusinessUnitRequired(businessUnitParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := models.AssertEquipmentConstraints(equipmentParam); err != nil {
+	if err := models.AssertBusinessUnitConstraints(businessUnitParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateEquipment(r.Context(), equipmentIdParam, equipmentParam)
+	result, err := c.service.UpdateBusinessUnit(r.Context(), unitIdParam, businessUnitParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

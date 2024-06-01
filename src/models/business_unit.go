@@ -7,6 +7,7 @@
  *   conduct on a daily basis so they can focus on the effective distribution
  *   of materiel, as well as maintain an accurate record keeping book of
  *   receiving, issuance, audits, surpluses, amongst other logistical tasks.
+
  *   Copyright (C) 2024  Jose Hernandez
  *
  *   This program is free software: you can redistribute it and/or modify
@@ -26,27 +27,28 @@
 package smidgen
 
 import (
-	utils "smidgen-backend/go/utils"
-	"time"
+	utils "smidgen-backend/src/utils"
 )
 
-type Equipment struct {
-	EquipmentId int32 `json:"equipment_id"`
-	BusinessUnitId int32 `json:"business_unit_id"`
-	Manufacturer string `json:"manufacturer"`
-	Model string `json:"model"`
-	Description string `json:"description"`
-	DateReceived time.Time `json:"date_received"`
-	LastInventoried time.Time `json:"last_inventoried"`
+type BusinessUnit struct {
+	UnitId         int32  `json:"unit_id"`
+	Name           string `json:"name"`
+	PointOfContact string `json:"point_of_contact"`
+	AddressLineOne string `json:"address_line_one"`
+	AddressLineTwo string `json:"address_line_two"`
+	State          string `json:"state"`
+	City           string `json:"city"`
+	Country        string `json:"country"`
 }
 
-func AssertEquipmentRequired(obj Equipment) error {
+func AssertBusinessUnitRequired(obj BusinessUnit) error {
 	elements := map[string]interface{}{
-		"equipment_id":     obj.EquipmentId,
-		"business_unit_id": obj.BusinessUnitId,
-		"manufacturer":     obj.Manufacturer,
-		"model":            obj.Model,
-		"date_received":    obj.DateReceived,
+		"name":             obj.Name,
+		"point_of_contact": obj.PointOfContact,
+		"address_line_one": obj.AddressLineOne,
+		"state":            obj.State,
+		"city":             obj.City,
+		"country":          obj.Country,
 	}
 	for name, el := range elements {
 		if isZero := utils.IsZeroValue(el); isZero {
@@ -57,7 +59,6 @@ func AssertEquipmentRequired(obj Equipment) error {
 	return nil
 }
 
-// AssertEquipmentConstraints checks if the values respects the defined constraints
-func AssertEquipmentConstraints(obj Equipment) error {
+func AssertBusinessUnitConstraints(obj BusinessUnit) error {
 	return nil
 }

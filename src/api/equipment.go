@@ -28,32 +28,32 @@ package smidgen
 import (
 	"encoding/json"
 	"net/http"
-	models "smidgen-backend/go/models"
-	utils "smidgen-backend/go/utils"
+	models "smidgen-backend/src/models"
+	utils "smidgen-backend/src/utils"
 	"strings"
 
 	"github.com/gorilla/mux"
 )
 
-// UserAPIController binds http requests to an api service and writes the service results to the http response
-type UserAPIController struct {
-	service      UserAPIServicer
+// EquipmentAPIController binds http requests to an api service and writes the service results to the http response
+type EquipmentAPIController struct {
+	service      EquipmentAPIServicer
 	errorHandler utils.ErrorHandler
 }
 
-// UserAPIOption for how the controller is set up.
-type UserAPIOption func(*UserAPIController)
+// EquipmentAPIOption for how the controller is set up.
+type EquipmentAPIOption func(*EquipmentAPIController)
 
-// WithUserAPIErrorHandler inject ErrorHandler into controller
-func WithUserAPIErrorHandler(h utils.ErrorHandler) UserAPIOption {
-	return func(c *UserAPIController) {
+// WithEquipmentAPIErrorHandler inject ErrorHandler into controller
+func WithEquipmentAPIErrorHandler(h utils.ErrorHandler) EquipmentAPIOption {
+	return func(c *EquipmentAPIController) {
 		c.errorHandler = h
 	}
 }
 
-// NewUserAPIController creates a default api controller
-func NewUserAPIController(s UserAPIServicer, opts ...UserAPIOption) utils.Router {
-	controller := &UserAPIController{
+// NewEquipmentAPIController creates a default api controller
+func NewEquipmentAPIController(s EquipmentAPIServicer, opts ...EquipmentAPIOption) utils.Router {
+	controller := &EquipmentAPIController{
 		service:      s,
 		errorHandler: utils.DefaultErrorHandler,
 	}
@@ -65,55 +65,55 @@ func NewUserAPIController(s UserAPIServicer, opts ...UserAPIOption) utils.Router
 	return controller
 }
 
-// utils.Routes returns all the api utils.routes for the UserAPIController
-func (c *UserAPIController) Routes() utils.Routes {
+// Routes returns all the api routes for the EquipmentAPIController
+func (c *EquipmentAPIController) Routes() utils.Routes {
 	return utils.Routes{
-		"AddUser": utils.Route{
+		"AddEquipment": utils.Route{
 			Method:      strings.ToUpper("Post"),
-			Pattern:     "user",
-			HandlerFunc: c.AddUser,
+			Pattern:     "equipment",
+			HandlerFunc: c.AddEquipment,
 		},
-		"DeleteUser": utils.Route{
+		"DeleteEquipment": utils.Route{
 			Method:      strings.ToUpper("Delete"),
-			Pattern:     "user/{user_id}",
-			HandlerFunc: c.DeleteUser,
+			Pattern:     "equipment/{equipment_id}",
+			HandlerFunc: c.DeleteEquipment,
 		},
-		"GetUser": utils.Route{
+		"GetEquipment": utils.Route{
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "user/",
-			HandlerFunc: c.GetUser,
+			Pattern:     "equipment/",
+			HandlerFunc: c.GetEquipment,
 		},
-		"GetUserById": utils.Route{
+		"GetEquipmentById": utils.Route{
 			Method:      strings.ToUpper("Get"),
-			Pattern:     "user/{user_id}",
-			HandlerFunc: c.GetUserById,
+			Pattern:     "equipment/{equipment_id}",
+			HandlerFunc: c.GetEquipmentById,
 		},
-		"UpdateUser": utils.Route{
+		"UpdateEquipment": utils.Route{
 			Method:      strings.ToUpper("Put"),
-			Pattern:     "user/{user_id}",
-			HandlerFunc: c.UpdateUser,
+			Pattern:     "equipment/{equipment_id}",
+			HandlerFunc: c.UpdateEquipment,
 		},
 	}
 }
 
-// AddUser - Create user
-func (c *UserAPIController) AddUser(w http.ResponseWriter, r *http.Request) {
-	userParam := models.User{}
+// AddEquipment - Create equipment
+func (c *EquipmentAPIController) AddEquipment(w http.ResponseWriter, r *http.Request) {
+	equipmentParam := models.Equipment{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&userParam); err != nil {
+	if err := d.Decode(&equipmentParam); err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := models.AssertUserRequired(userParam); err != nil {
+	if err := models.AssertEquipmentRequired(equipmentParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := models.AssertUserConstraints(userParam); err != nil {
+	if err := models.AssertEquipmentConstraints(equipmentParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.AddUser(r.Context(), userParam)
+	result, err := c.service.AddEquipment(r.Context(), equipmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -123,18 +123,18 @@ func (c *UserAPIController) AddUser(w http.ResponseWriter, r *http.Request) {
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// DeleteUser - Delete user
-func (c *UserAPIController) DeleteUser(w http.ResponseWriter, r *http.Request) {
+// DeleteEquipment - Delete equipment
+func (c *EquipmentAPIController) DeleteEquipment(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	userIdParam, err := utils.ParseNumericParameter[int32](
-		params["user_id"],
+	equipmentIdParam, err := utils.ParseNumericParameter[int32](
+		params["equipment_id"],
 		utils.WithRequire[int32](utils.ParseInt32),
 	)
 	if err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.DeleteUser(r.Context(), userIdParam)
+	result, err := c.service.DeleteEquipment(r.Context(), equipmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -144,9 +144,9 @@ func (c *UserAPIController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetUser - Get Users
-func (c *UserAPIController) GetUser(w http.ResponseWriter, r *http.Request) {
-	result, err := c.service.GetUsers(r.Context())
+// GetEquipment - Get equipments
+func (c *EquipmentAPIController) GetEquipment(w http.ResponseWriter, r *http.Request) {
+	result, err := c.service.GetEquipments(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -156,18 +156,18 @@ func (c *UserAPIController) GetUser(w http.ResponseWriter, r *http.Request) {
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// GetUserById - Get user
-func (c *UserAPIController) GetUserById(w http.ResponseWriter, r *http.Request) {
+// GetEquipmentById - Get equipment
+func (c *EquipmentAPIController) GetEquipmentById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	userIdParam, err := utils.ParseNumericParameter[int32](
-		params["user_id"],
+	equipmentIdParam, err := utils.ParseNumericParameter[int32](
+		params["equipment_id"],
 		utils.WithRequire[int32](utils.ParseInt32),
 	)
 	if err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	result, err := c.service.GetUserById(r.Context(), userIdParam)
+	result, err := c.service.GetEquipmentById(r.Context(), equipmentIdParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)
@@ -177,33 +177,33 @@ func (c *UserAPIController) GetUserById(w http.ResponseWriter, r *http.Request) 
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// UpdateUser - Update user
-func (c *UserAPIController) UpdateUser(w http.ResponseWriter, r *http.Request) {
+// UpdateEquipment - Update equipment
+func (c *EquipmentAPIController) UpdateEquipment(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	userIdParam, err := utils.ParseNumericParameter[int32](
-		params["user_id"],
+	equipmentIdParam, err := utils.ParseNumericParameter[int32](
+		params["equipment_id"],
 		utils.WithRequire[int32](utils.ParseInt32),
 	)
 	if err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	userParam := models.User{}
+	equipmentParam := models.Equipment{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
-	if err := d.Decode(&userParam); err != nil {
+	if err := d.Decode(&equipmentParam); err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
-	if err := models.AssertUserRequired(userParam); err != nil {
+	if err := models.AssertEquipmentRequired(equipmentParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	if err := models.AssertUserConstraints(userParam); err != nil {
+	if err := models.AssertEquipmentConstraints(equipmentParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return
 	}
-	result, err := c.service.UpdateUser(r.Context(), userIdParam, userParam)
+	result, err := c.service.UpdateEquipment(r.Context(), equipmentIdParam, equipmentParam)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		c.errorHandler(w, r, err, &result)

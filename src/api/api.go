@@ -28,8 +28,8 @@ package smidgen
 import (
 	"context"
 	"net/http"
-	models "smidgen-backend/go/models"
-	utils "smidgen-backend/go/utils"
+	models "smidgen-backend/src/models"
+	utils "smidgen-backend/src/utils"
 )
 
 // BusinessUnitAPIRouter defines the required methods for binding the api requests to a responses for the BusinessUnitAPI
