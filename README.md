@@ -11,7 +11,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Smidgen-Inventory-Management/backend-go">
-    <img src="smidgen_logo.png" alt="Logo" width="400">
+    <img src="logo.png" alt="Logo" width="400">
   </a>
 
 <h3 align="center">Smidgen Backend and Data Server</h3>
