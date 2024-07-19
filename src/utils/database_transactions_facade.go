@@ -29,9 +29,19 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 )
+
+type AuditLog struct {
+	LogID        string `json:"logID"`
+	Date         string `json:"date"`
+	Time         string `json:"time"`
+	ActionStatus string `json:"action_status"`
+	Action       string `json:"action"`
+}
 
 // GetRows operates by using an instance of DatabaseConnection.
 // GetRows must be provided a non-prefixed tableName, and uses a struct for data return.
@@ -41,6 +51,7 @@ func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]in
 
 	rows, err := dao.db.Query(query)
 	if err != nil {
+		dao.logAction("GetRows on: "+tableName, "Failed to query rows")
 		return nil, fmt.Errorf("\nfailed to query rows from table smidgen.%s: %v", tableName, err)
 	}
 	defer rows.Close()
@@ -56,6 +67,7 @@ func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]in
 
 	for rows.Next() {
 		if err := rows.Scan(destValues...); err != nil {
+			dao.logAction("GetRows on: "+tableName, "Failed to scan rows")
 			return nil, fmt.Errorf("\nfailed to scan rows from table smidgen.%s: %v", tableName, err)
 		}
 
@@ -67,9 +79,11 @@ func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]in
 		results = append(results, result.Interface())
 	}
 	if err := rows.Err(); err != nil {
+		dao.logAction("GetRows on: "+tableName, "Failed to iterate rows")
 		return nil, fmt.Errorf("\nerror while iterating over rows from table smidgen.%s: %v", tableName, err)
 	}
 
+	dao.logAction("GetRows on: "+tableName, "Succeeded")
 	return results, nil
 }
 
@@ -78,6 +92,7 @@ func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32
 
 	rows, err := dao.db.Query(query)
 	if err != nil {
+		dao.logAction("GetByID on: "+tableName, "Failed to query rows")
 		return nil, fmt.Errorf("\nfailed to query rows from table smidgen.%s: %v", tableName, err)
 	}
 	defer rows.Close()
@@ -90,10 +105,12 @@ func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32
 	}
 
 	if !rows.Next() {
+		dao.logAction("GetByID on: "+tableName, "No results returned")
 		return nil, fmt.Errorf("no rows returned by the query")
 	}
 
 	if err := rows.Scan(destValues...); err != nil {
+		dao.logAction("GetByID on: "+tableName, "Failed to scan rows")
 		return nil, fmt.Errorf("\nfailed to scan rows from table smidgen.%s: %v", tableName, err)
 	}
 
@@ -103,9 +120,11 @@ func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32
 	}
 
 	if err := rows.Err(); err != nil {
+		dao.logAction("GetByID on: "+tableName, "Failed to iterate rows")
 		return nil, fmt.Errorf("\nerror while iterating over rows from table smidgen.%s: %v", tableName, err)
 	}
 
+	dao.logAction("GetByID on: "+tableName, "Success")
 	return result.Interface(), nil
 }
 
@@ -115,6 +134,7 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 
 	tx, err := dao.db.Begin()
 	if err != nil {
+		dao.logAction("InsertRow on: "+tableName, "Failed")
 		return err
 	}
 	defer func() {
@@ -128,11 +148,11 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 	var placeholders []string
 
 	if err := tx.QueryRow("SELECT COALESCE(MAX(" + primaryID + "), 0) FROM smidgen." + tableName).Scan(&lastInsertedID); err != nil && err != sql.ErrNoRows {
+		dao.logAction("InsertRow on: "+tableName, "Failed")
 		return err
 	}
 
 	newID := lastInsertedID + 1
-
 	columns = append(columns, primaryID)
 	placeholders = append(placeholders, "$1")
 	for i := 1; i < v.NumField(); i++ {
@@ -143,6 +163,7 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 	query := fmt.Sprintf("INSERT INTO smidgen.%s (%s) VALUES (%s)", tableName, strings.Join(columns, ", "), strings.Join(placeholders, ", "))
 	stmt, err := tx.Prepare(query)
 	if err != nil {
+		dao.logAction("InsertRow on: "+tableName, "Failed")
 		return err
 	}
 	defer stmt.Close()
@@ -152,22 +173,24 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 	for i := 1; i < v.NumField(); i++ {
 		fieldValues[i] = v.Field(i).Interface()
 	}
-
+	
 	_, err = stmt.Exec(fieldValues...)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			if pqErr.Code == "23503" {
+				dao.logAction("InsertRow on: "+tableName, "Failed; pqerror 23503")
 				return fmt.Errorf("23503")
 			}
 		}
 	}
-
+	dao.logAction("InsertRow on: "+tableName, "Success")
 	return tx.Commit()
 }
 
 func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id int32, args ...interface{}) error {
 	tx, err := dao.db.Begin()
 	if err != nil {
+		dao.logAction("DeleteRow on: "+tableName, "Failed")
 		return err
 	}
 	defer func() {
@@ -180,23 +203,28 @@ func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id in
 
 	stmt, err := tx.Prepare(query)
 	if err != nil {
+		dao.logAction("DeleteRow on: "+tableName, "Failed")
 		return err
 	}
 	defer stmt.Close()
 
 	result, err := stmt.Exec(id)
 	if err != nil {
+		dao.logAction("DeleteRow on: "+tableName, "Failed")
 		return err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
+		dao.logAction("DeleteRow on: "+tableName, "Failed")
 		return err
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("user with id %d does not exist in table %s", id, tableName)
+		dao.logAction("DeleteRow on: "+tableName, "Failed; item not found")
+		return fmt.Errorf("item with id %d does not exist in table %s", id, tableName)
 	}
+	dao.logAction("DeleteRow on: "+tableName, "Success")
 	return tx.Commit()
 }
 
@@ -215,6 +243,7 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 
 	tx, err := dao.db.Begin()
 	if err != nil {
+		dao.logAction("UpdateRow on: "+tableName, "Failed")
 		return err
 	}
 	defer func() {
@@ -225,6 +254,7 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 
 	stmt, err := tx.Prepare(query)
 	if err != nil {
+		dao.logAction("UpdateRow on: "+tableName, "Failed")
 		return err
 	}
 	defer stmt.Close()
@@ -236,17 +266,40 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 
 	result, err := stmt.Exec(fieldValues...)
 	if err != nil {
+		dao.logAction("UpdateRow on: "+tableName, "Failed")
 		return err
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
+		dao.logAction("UpdateRow on: "+tableName, "Failed")
 		return err
 	}
 
 	if rowsAffected == 0 {
-		return fmt.Errorf("user with id %d does not exist in table %s", id, tableName)
+		dao.logAction("UpdateRow on: "+tableName, "Failed; item not found")
+		return fmt.Errorf("item with id %d does not exist in table %s", id, tableName)
 	}
 
+	dao.logAction("UpdateRow on: "+tableName, "Success")
 	return tx.Commit()
+}
+
+func (dao *DatabaseConnection) logAction(action, status string) {
+	privilege := "write"
+	dbConnection, err := NewDatabaseConnection(DatabaseConfigPath, privilege)
+	if err != nil {
+		log.Fatalf("Failed to establish database connection as %s: %v", privilege, err)
+	}
+	currentDateTime := time.Now()
+	auditLog := AuditLog{
+		LogID:        uuid.NewString(),
+		Date:         currentDateTime.Format("2006-01-02"),
+		Time:         currentDateTime.Format("15:04:05"),
+		ActionStatus: status,
+		Action:       action,
+	}
+	if err := dbConnection.InsertRow("auditlog", auditLog); err != nil {
+		log.Fatalf("Failed to log action: %v\n", err)
+	}
 }

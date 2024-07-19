@@ -45,10 +45,10 @@ var log = utils.Log()
 func main() {
 	_, err := os.Stat("configs")
 	dirExists := !os.IsNotExist(err)
-	argsLengthMoreThanTwo := (len(os.Args) == 3)
+	argsLengthMoreThanTwo := (len(os.Args) > 2)
 
 	switch {
-	case !dirExists && argsLengthMoreThanTwo:
+	case !dirExists || argsLengthMoreThanTwo:
 		log.Error("Path to configuration files not found. Ensure you have a \"configs\" directory, or run the server with the appropriate arguments.")
 		log.Error("Usage: go run main.go <path_to_server_configurations> <path_to_database_configurations>")
 		return

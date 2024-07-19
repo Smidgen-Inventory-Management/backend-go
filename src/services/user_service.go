@@ -50,6 +50,7 @@ func NewUserAPIService() api.UserAPIServicer {
 // AddUser - Create user
 func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.ImplResponse, error) {
 	privilege := "write"
+	
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)

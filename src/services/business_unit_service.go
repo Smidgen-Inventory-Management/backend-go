@@ -58,6 +58,7 @@ func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUn
 		log.Error(err)
 		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
 	}
+
 	return utils.Response(202, nil), nil
 }
 
