@@ -178,6 +178,6 @@ func loadRoutes(environmentConfig struct {
 	log.Debug("loaded API controllers")
 
 	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController)
-	log.Debug("successfully created routters")
+	log.Debug("successfully created routers")
 	return router
 }

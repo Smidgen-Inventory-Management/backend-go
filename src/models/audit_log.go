@@ -26,9 +26,9 @@
 package smidgen
 
 type AuditLog struct {
-	LogID        string `json:"logID"`
+	LogID        int `json:"logID"`
 	Date         string `json:"date"`
-	Time         bool   `json:"time"`
+	Time         string `json:"time"`
 	ActionStatus string `json:"action_status"`
 	Action       string `json:"action"`
 }
