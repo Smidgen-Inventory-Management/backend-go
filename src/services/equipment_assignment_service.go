@@ -27,11 +27,14 @@ package smidgen
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	api "smidgen-backend/src/api"
 	models "smidgen-backend/src/models"
 	utils "smidgen-backend/src/utils"
+	"time"
 )
 
 // EquipmentAssignmentAPIService is a service that implements the logic for the EquipmentAssignmentAPIServicer
@@ -48,33 +51,76 @@ func NewEquipmentAssignmentAPIService() api.EquipmentAssignmentAPIServicer {
 // AddEquipmentAssignment - Create assignment
 func (s *EquipmentAssignmentAPIService) AddEquipmentAssignment(ctx context.Context, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
 	privilege := "write"
+	var uuid16 [2]byte
+
+	_, err := rand.Read(uuid16[:])
+	if err != nil {
+		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
+	}
+
+	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
+
+	logEntry := models.AuditLog{
+		LogID:        uuid,
+		Date:         time.Now().Format("2006-01-02"),
+		Time:         time.Now().Format("15:04:05"),
+		ActionStatus: "FAILED",
+		Action:       "ADD_EQUIPMENT_ASSIGNMENT",
+	}
+	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
+		logConnection.InsertRow("auditlog", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.InsertRow("equipmentAssignment", equipmentAssignment)
 	if err != nil {
 		log.Error(err)
-		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
+		logConnection.InsertRow("auditlog", logEntry)	
+		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
 	}
+
+	logEntry.ActionStatus = "SUCCESS"
+	logConnection.InsertRow("auditlog", logEntry)
 	return utils.Response(202, nil), nil
 }
 
 // DeleteEquipmentAssignment - Delete assignment
 func (s *EquipmentAssignmentAPIService) DeleteEquipmentAssignment(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
+	var uuid16 [2]byte
+
+	_, err := rand.Read(uuid16[:])
+	if err != nil {
+		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
+	}
+
+	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
+
+	logEntry := models.AuditLog{
+		LogID:        uuid,
+		Date:         time.Now().Format("2006-01-02"),
+		Time:         time.Now().Format("15:04:05"),
+		ActionStatus: "FAILED",
+		Action:       "DELETE_EQUIPMENT_ASSIGNMENT",
+	}
+	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
+		logConnection.InsertRow("auditlog", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.DeleteRow("equipment", "equipmentid", assignmentId)
 	if err != nil {
+		logConnection.InsertRow("auditlog", logEntry)
 		log.Errorf("Error: %v", err)
 		return utils.Response(404, nil), err
 	}
 
+	logEntry.ActionStatus = "SUCCESS"
+	logConnection.InsertRow("auditlog", logEntry)
 	return utils.Response(200, nil), nil
 }
 
@@ -82,8 +128,26 @@ func (s *EquipmentAssignmentAPIService) DeleteEquipmentAssignment(ctx context.Co
 func (s *EquipmentAssignmentAPIService) GetEquipmentAssignments(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
+	var uuid16 [2]byte
+
+	_, err := rand.Read(uuid16[:])
+	if err != nil {
+		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
+	}
+
+	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
+
+	logEntry := models.AuditLog{
+		LogID:        uuid,
+		Date:         time.Now().Format("2006-01-02"),
+		Time:         time.Now().Format("15:04:05"),
+		ActionStatus: "FAILED",
+		Action:       "GET_EQUIPMENT_ASSIGNMENT",
+	}
+	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
+		logConnection.InsertRow("auditlog", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
@@ -91,10 +155,13 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignments(ctx context.Cont
 	rows, err := dbConnection.GetRows("equipmentAssignment", &dest)
 
 	if err != nil {
+		logConnection.InsertRow("auditlog", logEntry)
 		log.Error("Error: %v", err)
 	}
 
 	if len(rows) == 0 {
+		logEntry.ActionStatus = "SUCCESS"
+		logConnection.InsertRow("auditlog", logEntry)
 		return utils.Response(404, nil), fmt.Errorf("no equipment assignments were found in the database")
 	}
 
@@ -102,50 +169,98 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignments(ctx context.Cont
 	for _, row := range rows {
 		Assignment, ok := row.(models.EquipmentAssignment)
 		if !ok {
+			logEntry.ActionStatus = "WARN"
+			logConnection.InsertRow("auditlog", logEntry)
 			log.Warn("Warn: Unexpected type in row")
 			continue
 		}
 		Assignments = append(Assignments, Assignment)
 	}
 
+	logEntry.ActionStatus = "SUCCESS"
+	logConnection.InsertRow("auditlog", logEntry)
 	return utils.Response(200, Assignments), nil
 }
 
-// GetEquipmnentAssignmentById - Get assignment
+// GetEquipmentAssignmentById - Get assignment
 func (s *EquipmentAssignmentAPIService) GetEquipmentAssignmentById(ctx context.Context, assignmentId int32) (utils.ImplResponse, error) {
 	privilege := "read"
-	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
+	var uuid16 [2]byte
+
+	_, err := rand.Read(uuid16[:])
 	if err != nil {
-		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
+		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
 	}
 
-	var dest models.Equipment
-	row, err := dbConnection.GetByID("equipmetnAssignment", "assignmentId", assignmentId, &dest)
+	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
+
+	logEntry := models.AuditLog{
+		LogID:        uuid,
+		Date:         time.Now().Format("2006-01-02"),
+		Time:         time.Now().Format("15:04:05"),
+		ActionStatus: "FAILED",
+		Action:       "GET_EQUIPMENT_ASSIGNMENT_BY_ID",
+	}
+	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
+	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
+		logConnection.InsertRow("auditlog", logEntry)
+		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
+	}
+	var dest models.Equipment
+	row, err := dbConnection.GetByID("equipmentAssignment", "assignmentId", assignmentId, &dest)
+	if err != nil {
+		logConnection.InsertRow("auditlog", logEntry)
 		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
 	}
 
 	assignment, ok := row.(models.EquipmentAssignment)
 	if !ok {
+		logConnection.InsertRow("auditlog", logEntry)
 		log.Warn("Warn: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
+	logEntry.ActionStatus = "SUCCESS"
+	logConnection.InsertRow("auditlog", logEntry)
 	return utils.Response(200, assignment), nil
 }
 
 // UpdateEquipmentAssignment - Update assignment
 func (s *EquipmentAssignmentAPIService) UpdateEquipmentAssignment(ctx context.Context, assignmentId int32, equipmentAssignment models.EquipmentAssignment) (utils.ImplResponse, error) {
 	privilege := "write"
+	var uuid16 [2]byte
+
+	_, err := rand.Read(uuid16[:])
+	if err != nil {
+		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
+	}
+
+	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
+
+	logEntry := models.AuditLog{
+		LogID:        uuid,
+		Date:         time.Now().Format("2006-01-02"),
+		Time:         time.Now().Format("15:04:05"),
+		ActionStatus: "FAILED",
+		Action:       "UPDATE_EQUIPMENT_ASSIGNMENT",
+	}
+	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
+		logConnection.InsertRow("auditlog", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
+
 	err = dbConnection.UpdateRow("equipmentAssignment", "assignmentid", assignmentId, equipmentAssignment)
 	if err != nil {
+		logConnection.InsertRow("auditlog", logEntry)
 		log.Error(err)
 		return utils.Response(400, nil), err
 	}
+
+	logEntry.ActionStatus = "SUCCESS"
+	logConnection.InsertRow("auditlog", logEntry)
 	return utils.Response(202, nil), nil
 }

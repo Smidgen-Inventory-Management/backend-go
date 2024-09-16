@@ -141,3 +141,12 @@ type UserAPIServicer interface {
 	GetUserById(context.Context, int32) (utils.ImplResponse, error)
 	UpdateUser(context.Context, int32, models.User) (utils.ImplResponse, error)
 }
+
+// AuditLogServicer defines the api actions for the AuditLog service
+// This interface intended to stay up to date with the openapi yaml used to generate it,
+// while the service implementation can be ignored with the .openapi-generator-ignore file
+// and updated with the logic required for the API.
+type AuditLogAPIServicer interface {
+	GetAuditLogs(context.Context) (utils.ImplResponse, error)
+	GetAuditLogById(context.Context, int32) (utils.ImplResponse, error)
+}

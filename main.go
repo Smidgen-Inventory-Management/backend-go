@@ -168,6 +168,7 @@ func loadRoutes(environmentConfig struct {
 	EquipmentAPIService := service.NewEquipmentAPIService()
 	EquipmentAssignmentAPIService := service.NewEquipmentAssignmentAPIService()
 	UserAPIService := service.NewUserAPIService()
+	AuditLogService := service.NewAuditLogAPIService()
 	log.Debug("loaded API cervices")
 
 	DefaultAPIController := api.NewDefaultAPIController(DefaultAPIService)
@@ -175,9 +176,10 @@ func loadRoutes(environmentConfig struct {
 	EquipmentAPIController := api.NewEquipmentAPIController(EquipmentAPIService)
 	EquipmentAssignmentAPIController := api.NewEquipmentAssignmentAPIController(EquipmentAssignmentAPIService)
 	UserAPIController := api.NewUserAPIController(UserAPIService)
+	AuditLogAPIController := api.NewAuditLogAPIController(AuditLogService)
 	log.Debug("loaded API controllers")
 
-	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController)
+	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController, AuditLogAPIController)
 	log.Debug("successfully created routers")
 	return router
 }

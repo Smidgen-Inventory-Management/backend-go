@@ -33,14 +33,6 @@ import (
 	"github.com/lib/pq"
 )
 
-type AuditLog struct {
-	LogID        string `json:"logID"`
-	Date         string `json:"date"`
-	Time         string `json:"time"`
-	ActionStatus string `json:"action_status"`
-	Action       string `json:"action"`
-}
-
 // GetRows operates by using an instance of DatabaseConnection.
 // GetRows must be provided a non-prefixed tableName, and uses a struct for data return.
 // GetRows will return a new interface{} object.

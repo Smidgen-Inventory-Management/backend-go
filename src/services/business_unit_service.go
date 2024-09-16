@@ -56,7 +56,7 @@ func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUn
 
 	_, err := rand.Read(uuid16[:])
 	if err != nil {
-		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
+		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
 	}
 
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
@@ -84,7 +84,7 @@ func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUn
 		logEntry.ActionStatus = "FAILED"
 		logConnection.InsertRow("auditlog", logEntry)
 		log.Error(err)
-		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
+		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
 	}
 
 	logEntry.Action = "ADD_BUSINESS_UNIT"
@@ -102,7 +102,7 @@ func (s *BusinessUnitAPIService) DeleteBusinessUnit(ctx context.Context, unitId 
 
 	_, gen_err := rand.Read(uuid16[:])
 	if gen_err != nil {
-		return utils.Response(500, nil), errors.New("an error has occured while adding new data")
+		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
 	}
 
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
