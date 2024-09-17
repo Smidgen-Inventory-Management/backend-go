@@ -27,6 +27,7 @@ package smidgen
 
 import (
 	"context"
+	"fmt"
 	api "smidgen-backend/src/api"
 	utils "smidgen-backend/src/utils"
 	"time"
@@ -39,9 +40,9 @@ type DefaultAPIService struct {
 }
 
 type healthCheck struct {
-	Service string        `json:"service"`
-	Status  string        `json:"status"`
-	Latency time.Duration `json:"latency"`
+	Service string `json:"service"`
+	Status  string `json:"status"`
+	Latency string `json:"latency"`
 }
 
 // NewDefaultAPIService creates a default api service
@@ -57,9 +58,10 @@ func (s *DefaultAPIService) HealthCheck(ctx context.Context) (utils.ImplResponse
 	db, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "read")
 	if err != nil {
 		log.Errorf("failed to create database connection: %v", err)
-		healthcheckEnd := time.Since(healthcheckStart)
-		services = append(services, healthCheck{"API Server", "OK", healthcheckEnd})
-		services = append(services, healthCheck{"Database", "DOWN", -1})
+		healthcheckEnd := time.Since(healthcheckStart).Milliseconds()
+		services = append(services, healthCheck{"Overall", "DEGRADED", "DEGRADED"})
+		services = append(services, healthCheck{"API Server", "OK", fmt.Sprintf("%dms", healthcheckEnd)})
+		services = append(services, healthCheck{"Database", "DOWN", "DOWN"})
 		return utils.Response(500, services), nil
 	}
 	defer func() {
@@ -70,29 +72,33 @@ func (s *DefaultAPIService) HealthCheck(ctx context.Context) (utils.ImplResponse
 
 	if db == nil {
 		log.Errorf("database connection is nil")
-		healthcheckEnd := time.Since(healthcheckStart)
-		services = append(services, healthCheck{"API Server", "OK", healthcheckEnd})
-		services = append(services, healthCheck{"Database", "DEGREDADED", -1})
+		healthcheckEnd := time.Since(healthcheckStart).Milliseconds()
+		services = append(services, healthCheck{"Overall", "DEGRADED", "DEGRADED"})
+		services = append(services, healthCheck{"API Server", "OK", fmt.Sprintf("%dms", healthcheckEnd)})
+		services = append(services, healthCheck{"Database", "DEGRADED", "DEGRADED"})
 		return utils.Response(500, services), nil
 	}
 
 	start := time.Now()
 	err = db.Ping()
-	latency := time.Since(start)
+	databaseLatency := time.Since(start).Milliseconds()
 
 	if err != nil {
 		log.Errorf("failed to ping database: %v", err)
-		healthcheckEnd := time.Since(healthcheckStart)
-		services = append(services, healthCheck{"API Server", "OK", healthcheckEnd})
-		services = append(services, healthCheck{"Database", "DEGREDADED", -1})
+		healthcheckEnd := time.Since(healthcheckStart).Milliseconds()
+		services = append(services, healthCheck{"Overall", "DEGRADED", "DEGRADED"})
+		services = append(services, healthCheck{"API Server", "OK", fmt.Sprintf("%dms", healthcheckEnd)})
+		services = append(services, healthCheck{"Database", "DEGRADED", "DEGRADED"})
 		return utils.Response(500, services), nil
 	}
 
-	log.Infof("connection to database successfully established in %s", latency)
+	log.Infof("connection to database successfully established in %d", databaseLatency)
 
-	healthcheckEnd := time.Since(healthcheckStart)
-	services = append(services, healthCheck{"API Server", "OK", healthcheckEnd})
-	services = append(services, healthCheck{"Database", "OK", latency})
+	healthcheckEnd := time.Since(healthcheckStart).Milliseconds()
+	totalLatency := healthcheckEnd + databaseLatency
+	services = append(services, healthCheck{"Overall", "OK", fmt.Sprintf("%dms", totalLatency)})
+	services = append(services, healthCheck{"API Server", "OK", fmt.Sprintf("%dms", healthcheckEnd)})
+	services = append(services, healthCheck{"Database", "OK", fmt.Sprintf("%dms", databaseLatency)})
 	return utils.Response(200, services), nil
 }
 
