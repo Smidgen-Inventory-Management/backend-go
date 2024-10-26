@@ -76,8 +76,6 @@ func main() {
 
 	log = utils.Log(envConfig.Debug)
 
-	
-
 	hostname := envConfig.Host + ":" + envConfig.Port
 	router := loadRoutes(envConfig)
 
@@ -88,16 +86,10 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				if err := retryDatabaseConnection(utils.DatabaseConfigPath); err != nil {
-					log.Errorf("Failed to connect to database: %v", err)
-				} else {
-					log.Debug("Database connection successful!")
-				}
+				retryDatabaseConnection(utils.DatabaseConfigPath)
 			}
 		}
 	}()
-
-
 
 	log.Debug("Routes loaded.")
 	log.Infof("Server starting on %s", hostname)
@@ -113,7 +105,7 @@ func main() {
 	}
 }
 
-func retryDatabaseConnection(configPath string) error {
+func retryDatabaseConnection(configPath string) {
 	const maxRetries = 3
 	for attempt := 1; attempt <= maxRetries; attempt++ {
 		if err := CheckDatabaseConnection(configPath); err != nil {
@@ -122,11 +114,9 @@ func retryDatabaseConnection(configPath string) error {
 				time.Sleep(3 * time.Second)
 				continue
 			}
-			return fmt.Errorf(fmt.Sprintf("failed to connect to database after %d attempts. Verify the database is running then relaunch the server", maxRetries))
+			log.Fatalf(fmt.Sprintf("failed to connect to database after %d attempts. Verify the database is running then relaunch the server", maxRetries))
 		}
-		return nil
 	}
-	return nil
 }
 
 func CheckDatabaseConnection(configPath string) error {

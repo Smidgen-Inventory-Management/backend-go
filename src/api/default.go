@@ -67,7 +67,7 @@ func (c *DefaultAPIController) Routes() utils.Routes {
 		"CheckHealthcheckGet": utils.Route{
 			Method:      strings.ToUpper("Get"),
 			Pattern:     "healthcheck",
-			HandlerFunc: c.CheckHealthcheckGet,
+			HandlerFunc: c.HealthCheckGet,
 		},
 		"RootGet": utils.Route{
 			Method:      strings.ToUpper("Get"),
@@ -77,8 +77,8 @@ func (c *DefaultAPIController) Routes() utils.Routes {
 	}
 }
 
-// CheckHealthcheckGet - Check
-func (c *DefaultAPIController) CheckHealthcheckGet(w http.ResponseWriter, r *http.Request) {
+
+func (c *DefaultAPIController) HealthCheckGet(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.HealthCheck(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {

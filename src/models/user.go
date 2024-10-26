@@ -35,7 +35,7 @@ type User struct {
 	BusinessUnitId int32          `json:"business_unit_id"`
 	Username       string         `json:"username"`
 	Email          string         `json:"email"`
-	SaltedPassword sql.NullString `json:"salted_password"`
+	SaltedPassword sql.NullString `json:"-" swaggerignore:"true"`
 }
 
 // AssertUserRequired checks if the required fields are not zero-ed

@@ -33,11 +33,13 @@ import (
 	"github.com/lib/pq"
 )
 
-// GetRows operates by using an instance of DatabaseConnection.
-// GetRows must be provided a non-prefixed tableName, and uses a struct for data return.
-// GetRows will return a new interface{} object.
 func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]interface{}, error) {
-	query := fmt.Sprintf("SELECT * FROM smidgen.%s", tableName)
+	_, err := validateTableName(dao, tableName)
+	if err != nil {
+		return nil, err
+	}
+
+	query := fmt.Sprintf("SELECT * FROM smidgen.%s;", tableName)
 
 	rows, err := dao.db.Query(query)
 	if err != nil {
@@ -74,9 +76,15 @@ func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]in
 }
 
 func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32, dest interface{}) (interface{}, error) {
-	query := fmt.Sprintf("SELECT * FROM smidgen.%s WHERE %s=%d", tableName, idName, id)
+	_, err := validateTableName(dao, tableName)
+	if err != nil {
+		return nil, err
+	}
 
-	rows, err := dao.db.Query(query)
+	query := fmt.Sprintf("SELECT * FROM smidgen.%s WHERE %s = ?;", tableName, idName)
+
+	rows, err := dao.db.Query(query, id)
+
 	if err != nil {
 		return nil, fmt.Errorf("\nfailed to query rows from table smidgen.%s: %v", tableName, err)
 	}
@@ -110,6 +118,11 @@ func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32
 }
 
 func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) error {
+	_, err := validateTableName(dao, tableName)
+	if err != nil {
+		return err
+	}
+
 	v := reflect.ValueOf(values)
 	primaryID := v.Type().Field(0).Name
 
@@ -151,7 +164,7 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 	for i := 1; i < v.NumField(); i++ {
 		fieldValues[i] = v.Field(i).Interface()
 	}
-	
+
 	_, err = stmt.Exec(fieldValues...)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
@@ -164,6 +177,12 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 }
 
 func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id int32, args ...interface{}) error {
+
+	_, err := validateTableName(dao, tableName)
+	if err != nil {
+		return err
+	}
+
 	tx, err := dao.db.Begin()
 	if err != nil {
 		return err
@@ -174,7 +193,7 @@ func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id in
 		}
 	}()
 
-	query := fmt.Sprintf("DELETE FROM smidgen.%s WHERE %s=$1", tableName, idLabel)
+	query := fmt.Sprintf("DELETE FROM smidgen.%s WHERE %s=$1;", tableName, idLabel)
 
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -199,6 +218,11 @@ func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id in
 }
 
 func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id int32, values interface{}) error {
+	_, err := validateTableName(dao, tableName)
+	if err != nil {
+		return err
+	}
+
 	v := reflect.ValueOf(values)
 	objectType := v.Type()
 
@@ -247,4 +271,33 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 	}
 
 	return tx.Commit()
+}
+
+func validateTableName(dao *DatabaseConnection, tableName string) (bool, error) {
+
+	rows, err := dao.db.Query(`
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'smidgen' AND table_type = 'BASE TABLE'
+`)
+
+	if err != nil {
+		return true, err
+	}
+	defer rows.Close()
+
+	validTableNames := make(map[string]bool)
+
+	for rows.Next() {
+		var tableName string
+		if err := rows.Scan(&tableName); err != nil {
+			return false, err
+		}
+		validTableNames[tableName] = true
+	}
+
+	if validTableNames[tableName] {
+		return false, fmt.Errorf("invalid table name: %s", tableName)
+	}
+	return true, nil
 }
