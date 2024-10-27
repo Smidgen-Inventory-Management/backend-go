@@ -98,6 +98,7 @@ func (c *EquipmentAssignmentAPIController) Routes() utils.Routes {
 
 // AddEquipmentAssignment - Create assignment
 func (c *EquipmentAssignmentAPIController) AddEquipmentAssignment(w http.ResponseWriter, r *http.Request) {
+
 	equipmentAssignmentParam := models.EquipmentAssignment{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -125,6 +126,7 @@ func (c *EquipmentAssignmentAPIController) AddEquipmentAssignment(w http.Respons
 
 // DeleteEquipmentAssignment - Delete assignment
 func (c *EquipmentAssignmentAPIController) DeleteEquipmentAssignment(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	assignmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["assignment_id"],
@@ -146,6 +148,7 @@ func (c *EquipmentAssignmentAPIController) DeleteEquipmentAssignment(w http.Resp
 
 // GetEquipmentAssignment - Get assignments
 func (c *EquipmentAssignmentAPIController) GetEquipmentAssignment(w http.ResponseWriter, r *http.Request) {
+
 	result, err := c.service.GetEquipmentAssignments(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -158,6 +161,7 @@ func (c *EquipmentAssignmentAPIController) GetEquipmentAssignment(w http.Respons
 
 // GetEquipmentAssignmentById - Get assignment
 func (c *EquipmentAssignmentAPIController) GetEquipmentAssignmentById(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	assignmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["assignment_id"],
@@ -179,6 +183,7 @@ func (c *EquipmentAssignmentAPIController) GetEquipmentAssignmentById(w http.Res
 
 // UpdateEquipmentAssignment - Update assignment
 func (c *EquipmentAssignmentAPIController) UpdateEquipmentAssignment(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	assignmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["assignment_id"],

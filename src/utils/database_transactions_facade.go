@@ -72,6 +72,7 @@ func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]in
 		return nil, fmt.Errorf("\nerror while iterating over rows from table smidgen.%s: %v", tableName, err)
 	}
 
+	dao.db.Close()
 	return results, nil
 }
 
@@ -114,6 +115,7 @@ func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32
 		return nil, fmt.Errorf("\nerror while iterating over rows from table smidgen.%s: %v", tableName, err)
 	}
 
+	dao.db.Close()
 	return result.Interface(), nil
 }
 
@@ -173,6 +175,8 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 			}
 		}
 	}
+
+	dao.db.Close()
 	return tx.Commit()
 }
 
@@ -214,6 +218,7 @@ func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id in
 	if rowsAffected == 0 {
 		return fmt.Errorf("item with id %d does not exist in table %s", id, tableName)
 	}
+	dao.db.Close()
 	return tx.Commit()
 }
 
@@ -269,7 +274,7 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 	if rowsAffected == 0 {
 		return fmt.Errorf("item with id %d does not exist in table %s", id, tableName)
 	}
-
+	dao.db.Close()
 	return tx.Commit()
 }
 
@@ -296,7 +301,7 @@ func validateTableName(dao *DatabaseConnection, tableName string) (bool, error) 
 		validTableNames[tableName] = true
 	}
 
-	if validTableNames[tableName] {
+	if !validTableNames[tableName] {
 		return false, fmt.Errorf("invalid table name: %s", tableName)
 	}
 	return true, nil

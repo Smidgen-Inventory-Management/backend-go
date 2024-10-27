@@ -77,8 +77,8 @@ func (c *DefaultAPIController) Routes() utils.Routes {
 	}
 }
 
-
 func (c *DefaultAPIController) HealthCheckGet(w http.ResponseWriter, r *http.Request) {
+
 	result, err := c.service.HealthCheck(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -91,6 +91,7 @@ func (c *DefaultAPIController) HealthCheckGet(w http.ResponseWriter, r *http.Req
 
 // RootGet - Root
 func (c *DefaultAPIController) RootGet(w http.ResponseWriter, r *http.Request) {
+
 	result, err := c.service.RootGet(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {

@@ -63,6 +63,12 @@ const errMsgMaxValueConstraint = "provided parameter is not respecting maximum v
 // NewRouter creates a new router for any number of api routers
 func NewRouter(basePath string, routers ...Router) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
+	router.Methods("OPTIONS").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        w.Header().Set("Access-Control-Allow-Origin", "*")
+        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        w.WriteHeader(http.StatusNoContent)
+    })
 	for _, api := range routers {
 		for name, route := range api.Routes() {
 			var handler http.Handler
@@ -79,10 +85,13 @@ func NewRouter(basePath string, routers ...Router) *mux.Router {
 	return router
 }
 
+
 // EncodeJSONResponse uses the json encoder to write an interface to the http response with an optional status code
 func EncodeJSONResponse(i interface{}, status *int, w http.ResponseWriter) error {
 	wHeader := w.Header()
-
+	wHeader.Set("Access-Control-Allow-Origin", "*")
+	wHeader.Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+	wHeader.Set("Access-Control-Allow-Headers", "Content-Type")
 	f, ok := i.(*os.File)
 	if ok {
 		data, err := io.ReadAll(f)

@@ -76,7 +76,7 @@ func (c *BusinessUnitAPIController) Routes() utils.Routes {
 		"DeletBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Delete"),
 			Pattern:     "business_unit/{unit_id}",
-			HandlerFunc: c.DeletBusinessUnit,
+			HandlerFunc: c.DeleteBusinessUnit,
 		},
 		"GetBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Get"),
@@ -98,6 +98,7 @@ func (c *BusinessUnitAPIController) Routes() utils.Routes {
 
 // AddBusinessUnit - Create Business Unit
 func (c *BusinessUnitAPIController) AddBusinessUnit(w http.ResponseWriter, r *http.Request) {
+
 	businessUnitParam := models.BusinessUnit{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -123,8 +124,9 @@ func (c *BusinessUnitAPIController) AddBusinessUnit(w http.ResponseWriter, r *ht
 	utils.EncodeJSONResponse(result.Body, &result.Code, w)
 }
 
-// DeletBusinessUnit - Delete Business Unit
-func (c *BusinessUnitAPIController) DeletBusinessUnit(w http.ResponseWriter, r *http.Request) {
+// DeleteBusinessUnit - Delete Business Unit
+func (c *BusinessUnitAPIController) DeleteBusinessUnit(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	unitIdParam, err := utils.ParseNumericParameter[int32](
 		params["unit_id"],
@@ -146,6 +148,7 @@ func (c *BusinessUnitAPIController) DeletBusinessUnit(w http.ResponseWriter, r *
 
 // GetBusinessUnit - Get Business Units
 func (c *BusinessUnitAPIController) GetBusinessUnit(w http.ResponseWriter, r *http.Request) {
+
 	result, err := c.service.GetBusinessUnits(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -158,6 +161,7 @@ func (c *BusinessUnitAPIController) GetBusinessUnit(w http.ResponseWriter, r *ht
 
 // GetBusinessUnitById - Get Business Unit
 func (c *BusinessUnitAPIController) GetBusinessUnitById(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	unitIdParam, err := utils.ParseNumericParameter[int32](
 		params["unit_id"],
@@ -179,6 +183,7 @@ func (c *BusinessUnitAPIController) GetBusinessUnitById(w http.ResponseWriter, r
 
 // UpdateBusinessUnit - Update Business Unit
 func (c *BusinessUnitAPIController) UpdateBusinessUnit(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	unitIdParam, err := utils.ParseNumericParameter[int32](
 		params["unit_id"],

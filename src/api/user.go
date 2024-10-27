@@ -98,6 +98,7 @@ func (c *UserAPIController) Routes() utils.Routes {
 
 // AddUser - Create user
 func (c *UserAPIController) AddUser(w http.ResponseWriter, r *http.Request) {
+
 	userParam := models.User{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -125,6 +126,7 @@ func (c *UserAPIController) AddUser(w http.ResponseWriter, r *http.Request) {
 
 // DeleteUser - Delete user
 func (c *UserAPIController) DeleteUser(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	userIdParam, err := utils.ParseNumericParameter[int32](
 		params["user_id"],
@@ -146,6 +148,7 @@ func (c *UserAPIController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 // GetUser - Get Users
 func (c *UserAPIController) GetUser(w http.ResponseWriter, r *http.Request) {
+
 	result, err := c.service.GetUsers(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -158,6 +161,7 @@ func (c *UserAPIController) GetUser(w http.ResponseWriter, r *http.Request) {
 
 // GetUserById - Get user
 func (c *UserAPIController) GetUserById(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	userIdParam, err := utils.ParseNumericParameter[int32](
 		params["user_id"],
@@ -179,6 +183,7 @@ func (c *UserAPIController) GetUserById(w http.ResponseWriter, r *http.Request) 
 
 // UpdateUser - Update user
 func (c *UserAPIController) UpdateUser(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	userIdParam, err := utils.ParseNumericParameter[int32](
 		params["user_id"],

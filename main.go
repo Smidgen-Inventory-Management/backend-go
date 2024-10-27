@@ -173,7 +173,7 @@ func loadRoutes(environmentConfig struct {
 	EquipmentAssignmentAPIService := service.NewEquipmentAssignmentAPIService()
 	UserAPIService := service.NewUserAPIService()
 	AuditLogService := service.NewAuditLogAPIService()
-	log.Debug("loaded API cervices")
+	log.Debug("loaded API services")
 
 	DefaultAPIController := api.NewDefaultAPIController(DefaultAPIService)
 	BusinessUnitAPIController := api.NewBusinessUnitAPIController(BusinessUnitAPIService)

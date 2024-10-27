@@ -98,6 +98,11 @@ func (c *EquipmentAPIController) Routes() utils.Routes {
 
 // AddEquipment - Create equipment
 func (c *EquipmentAPIController) AddEquipment(w http.ResponseWriter, r *http.Request) {
+	// Handle preflight OPTIONS request
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 	equipmentParam := models.Equipment{}
 	d := json.NewDecoder(r.Body)
 	d.DisallowUnknownFields()
@@ -125,6 +130,7 @@ func (c *EquipmentAPIController) AddEquipment(w http.ResponseWriter, r *http.Req
 
 // DeleteEquipment - Delete equipment
 func (c *EquipmentAPIController) DeleteEquipment(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	equipmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["equipment_id"],
@@ -146,6 +152,11 @@ func (c *EquipmentAPIController) DeleteEquipment(w http.ResponseWriter, r *http.
 
 // GetEquipment - Get equipments
 func (c *EquipmentAPIController) GetEquipment(w http.ResponseWriter, r *http.Request) {
+	// Handle preflight OPTIONS request
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
 	result, err := c.service.GetEquipments(r.Context())
 	// If an error occurred, encode the error with the status code
 	if err != nil {
@@ -158,6 +169,7 @@ func (c *EquipmentAPIController) GetEquipment(w http.ResponseWriter, r *http.Req
 
 // GetEquipmentById - Get equipment
 func (c *EquipmentAPIController) GetEquipmentById(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	equipmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["equipment_id"],
@@ -179,6 +191,7 @@ func (c *EquipmentAPIController) GetEquipmentById(w http.ResponseWriter, r *http
 
 // UpdateEquipment - Update equipment
 func (c *EquipmentAPIController) UpdateEquipment(w http.ResponseWriter, r *http.Request) {
+
 	params := mux.Vars(r)
 	equipmentIdParam, err := utils.ParseNumericParameter[int32](
 		params["equipment_id"],
