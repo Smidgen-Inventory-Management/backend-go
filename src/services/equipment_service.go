@@ -165,7 +165,7 @@ func (s *EquipmentAPIService) GetEquipments(ctx context.Context) (utils.ImplResp
 	}
 	if len(rows) == 0 {
 		logConnection.InsertRow("auditlog", logEntry)
-		return utils.Response(404, nil), fmt.Errorf("no equipment was found in the database")
+		return utils.Response(200, nil), fmt.Errorf("no equipment was found in the database")
 	}
 	var Assets []models.Equipment
 	for _, row := range rows {
