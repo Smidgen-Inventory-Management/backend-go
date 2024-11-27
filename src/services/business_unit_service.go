@@ -62,11 +62,10 @@ func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUn
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "Failed",
-		Action:       "POST",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "POST",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 
@@ -74,22 +73,22 @@ func (s *BusinessUnitAPIService) AddBusinessUnit(ctx context.Context, businessUn
 	if err != nil {
 		logEntry.Action = "ADD_BUSINESS_UNIT"
 		logEntry.ActionStatus = "FAILED"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.InsertRow("businessunit", businessUnit)
+	err = dbConnection.InsertRow("business_units", businessUnit)
 	if err != nil {
 		logEntry.Action = "ADD_BUSINESS_UNIT"
 		logEntry.ActionStatus = "FAILED"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Error(err)
 		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
 	}
 
 	logEntry.Action = "ADD_BUSINESS_UNIT"
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(202, nil), nil
 }
 
@@ -108,33 +107,32 @@ func (s *BusinessUnitAPIService) DeleteBusinessUnit(ctx context.Context, unitId 
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "Failed",
-		Action:       "POST",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "POST",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 
 	if err != nil {
 		logEntry.Action = "DELETE_BUSINESS_UNIT"
 		logEntry.ActionStatus = "FAILED"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.DeleteRow("businessUnit", "UnitID", unitId)
+	err = dbConnection.DeleteRow("business_units", "UnitID", unitId)
 	if err != nil {
 		logEntry.Action = "DELETE_BUSINESS_UNIT"
 		logEntry.ActionStatus = "FAILED"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Error: %v", err)
 		return utils.Response(404, nil), err
 	}
 
 	logEntry.Action = "DELETE_BUSINESS_UNIT"
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(200, nil), nil
 }
 
@@ -153,11 +151,10 @@ func (s *BusinessUnitAPIService) GetBusinessUnits(ctx context.Context) (utils.Im
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "",
-		Action:       "",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 
@@ -167,19 +164,19 @@ func (s *BusinessUnitAPIService) GetBusinessUnits(ctx context.Context) (utils.Im
 	}
 
 	var dest models.BusinessUnit
-	rows, err := dbConnection.GetRows("businessUnit", &dest)
+	rows, err := dbConnection.GetRows("business_units", &dest)
 
 	if err != nil {
 		logEntry.Action = "GET_BUSINESS_UNIT"
 		logEntry.ActionStatus = "WARN"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Error: %v", err)
 	}
 
 	if len(rows) == 0 {
 		logEntry.Action = "GET_BUSINESS_UNIT"
 		logEntry.ActionStatus = "FAILED"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		return utils.Response(404, nil), fmt.Errorf("no business units were found in the database")
 	}
 
@@ -189,7 +186,7 @@ func (s *BusinessUnitAPIService) GetBusinessUnits(ctx context.Context) (utils.Im
 		if !ok {
 			logEntry.Action = "GET_BUSINESS_UNIT"
 			logEntry.ActionStatus = "WARN"
-			logConnection.InsertRow("auditlog", logEntry)
+			logConnection.InsertRow("audit_log", logEntry)
 			log.Warn("Warn: Unexpected type in row")
 			continue
 		}
@@ -198,7 +195,7 @@ func (s *BusinessUnitAPIService) GetBusinessUnits(ctx context.Context) (utils.Im
 
 	logEntry.Action = "GET_BUSINESS_UNIT"
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(200, businessUnits), nil
 }
 
@@ -217,11 +214,10 @@ func (s *BusinessUnitAPIService) GetBusinessUnitById(ctx context.Context, unitId
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "",
-		Action:       "",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 
@@ -229,16 +225,16 @@ func (s *BusinessUnitAPIService) GetBusinessUnitById(ctx context.Context, unitId
 	if err != nil {
 		logEntry.Action = "GET_BUSINESS_UNIT_BY_ID"
 		logEntry.ActionStatus = "FAILED"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	var dest models.BusinessUnit
-	row, err := dbConnection.GetByID("businessUnit", "unitid", unitId, &dest)
+	row, err := dbConnection.GetByID("business_units", "unitId", unitId, &dest)
 	if err != nil {
 		logEntry.Action = "GET_BUSINESS_UNIT_BY_ID"
 		logEntry.ActionStatus = "FAILED"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
 	}
@@ -247,14 +243,14 @@ func (s *BusinessUnitAPIService) GetBusinessUnitById(ctx context.Context, unitId
 	if !ok {
 		logEntry.Action = "GET_BUSINESS_UNIT_BY_ID"
 		logEntry.ActionStatus = "WARN"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Warn("Warn: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
 
 	logEntry.Action = "GET_BUSINESS_UNIT_BY_ID"
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(200, unit), nil
 }
 
@@ -273,11 +269,10 @@ func (s *BusinessUnitAPIService) UpdateBusinessUnit(ctx context.Context, unitId 
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "",
-		Action:       "",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 
@@ -285,21 +280,21 @@ func (s *BusinessUnitAPIService) UpdateBusinessUnit(ctx context.Context, unitId 
 	if err != nil {
 		logEntry.Action = "UPDATE_BUSINESS_UNIT"
 		logEntry.ActionStatus = "FAILED"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.UpdateRow("businessUnit", "unitid", unitId, businessUnit)
+	err = dbConnection.UpdateRow("business_units", "unitId", unitId, businessUnit)
 	if err != nil {
 		logEntry.Action = "UPDATE_BUSINESS_UNIT"
 		logEntry.ActionStatus = "FAILED"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Error(err)
 		return utils.Response(400, nil), err
 	}
 
 	logEntry.Action = "UPDATE_BUSINESS_UNIT"
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(202, nil), nil
 }

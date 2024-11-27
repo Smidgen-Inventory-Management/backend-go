@@ -26,26 +26,38 @@
 package smidgen
 
 import (
-	"reflect"
-	"regexp"
-	"strings"
+	utils "smidgen-backend/src/utils"
+	"time"
 )
 
-// Response return a ImplResponse struct filled
-func Response(code int, body interface{}) ImplResponse {
-	return ImplResponse{
-		Code: code,
-		Body: body,
+type Manufacturer struct {
+	ManufacturerId int32     `json:"manufacturer_id"`
+	Name           string    `json:"name"`
+	PrimaryService string    `json:"primary_service"`
+	PointOfContact string    `json:"point_of_contact"`
+	Location       string    `json:"location"`
+	DateAdded      time.Time `json:"date_added"`
+}
+
+func AssertManufacturerRequired(obj Manufacturer) error {
+	elements := map[string]interface{}{
+		"manufacturer_id":  obj.ManufacturerId,
+		"name":             obj.Name,
+		"primary_service":  obj.PrimaryService,
+		"point_of_contact": obj.PointOfContact,
+		"location":         obj.Location,
+		"date_added":       obj.DateAdded,
 	}
+	for name, el := range elements {
+		if isZero := utils.IsZeroValue(el); isZero {
+			return &utils.RequiredError{Field: name}
+		}
+	}
+
+	return nil
 }
 
-// IsZeroValue checks if the val is zero-ed value.
-func IsZeroValue(val interface{}) bool {
-	return val == nil || reflect.DeepEqual(val, reflect.Zero(reflect.TypeOf(val)).Interface())
-}
-
-func CamelToSnake(input string) string {
-	re := regexp.MustCompile("([a-z0-9])([A-Z])")
-	snake := re.ReplaceAllString(input, "${1}_${2}")
-	return strings.ToLower(snake)
+// AssertEquipmentConstraints checks if the values respects the defined constraints
+func AssertManufacturerConstraints(obj Manufacturer) error {
+	return nil
 }

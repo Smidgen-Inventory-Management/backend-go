@@ -61,28 +61,27 @@ func (s *EquipmentAssignmentAPIService) AddEquipmentAssignment(ctx context.Conte
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "FAILED",
-		Action:       "ADD_EQUIPMENT_ASSIGNMENT",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "ADD_EQUIPMENT_ASSIGNMENT",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.InsertRow("equipmentAssignment", equipmentAssignment)
+	err = dbConnection.InsertRow("equipment_assignment", equipmentAssignment)
 	if err != nil {
 		log.Error(err)
-		logConnection.InsertRow("auditlog", logEntry)	
+		logConnection.InsertRow("audit_log", logEntry)
 		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
 	}
 
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(202, nil), nil
 }
 
@@ -99,28 +98,27 @@ func (s *EquipmentAssignmentAPIService) DeleteEquipmentAssignment(ctx context.Co
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "FAILED",
-		Action:       "DELETE_EQUIPMENT_ASSIGNMENT",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "DELETE_EQUIPMENT_ASSIGNMENT",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	err = dbConnection.DeleteRow("equipment", "equipmentid", assignmentId)
 	if err != nil {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Error: %v", err)
 		return utils.Response(404, nil), err
 	}
 
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(200, nil), nil
 }
 
@@ -138,30 +136,29 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignments(ctx context.Cont
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "FAILED",
-		Action:       "GET_EQUIPMENT_ASSIGNMENT",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "GET_EQUIPMENT_ASSIGNMENT",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	var dest models.EquipmentAssignment
-	rows, err := dbConnection.GetRows("equipmentAssignment", &dest)
+	rows, err := dbConnection.GetRows("equipment_assignment", &dest)
 
 	if err != nil {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Error("Error: %v", err)
 	}
 
 	if len(rows) == 0 {
 		logEntry.ActionStatus = "SUCCESS"
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		return utils.Response(404, nil), fmt.Errorf("no equipment assignments were found in the database")
 	}
 
@@ -170,7 +167,7 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignments(ctx context.Cont
 		Assignment, ok := row.(models.EquipmentAssignment)
 		if !ok {
 			logEntry.ActionStatus = "WARN"
-			logConnection.InsertRow("auditlog", logEntry)
+			logConnection.InsertRow("audit_log", logEntry)
 			log.Warn("Warn: Unexpected type in row")
 			continue
 		}
@@ -178,7 +175,7 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignments(ctx context.Cont
 	}
 
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(200, Assignments), nil
 }
 
@@ -195,34 +192,33 @@ func (s *EquipmentAssignmentAPIService) GetEquipmentAssignmentById(ctx context.C
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "FAILED",
-		Action:       "GET_EQUIPMENT_ASSIGNMENT_BY_ID",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "GET_EQUIPMENT_ASSIGNMENT_BY_ID",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 	var dest models.Equipment
-	row, err := dbConnection.GetByID("equipmentAssignment", "assignmentId", assignmentId, &dest)
+	row, err := dbConnection.GetByID("equipment_assignment", "assignmentId", assignmentId, &dest)
 	if err != nil {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
 	}
 
 	assignment, ok := row.(models.EquipmentAssignment)
 	if !ok {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Warn("Warn: Unexpected type in row")
 		return utils.Response(500, nil), errors.New("unexpected type in row")
 	}
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(200, assignment), nil
 }
 
@@ -239,28 +235,26 @@ func (s *EquipmentAssignmentAPIService) UpdateEquipmentAssignment(ctx context.Co
 	uuid := int(binary.BigEndian.Uint16(uuid16[:]))
 
 	logEntry := models.AuditLog{
-		LogID:        uuid,
-		Date:         time.Now().Format("2006-01-02"),
-		Time:         time.Now().Format("15:04:05"),
-		ActionStatus: "FAILED",
-		Action:       "UPDATE_EQUIPMENT_ASSIGNMENT",
+		LogId:           uuid,
+		ActionTimestamp: time.Now(),
+		ActionStatus:    "Failed",
+		Action:          "UPDATE_EQUIPMENT_ASSIGNMENT",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-
-	err = dbConnection.UpdateRow("equipmentAssignment", "assignmentid", assignmentId, equipmentAssignment)
+	err = dbConnection.UpdateRow("equipment_assignment", "assignmentid", assignmentId, equipmentAssignment)
 	if err != nil {
-		logConnection.InsertRow("auditlog", logEntry)
+		logConnection.InsertRow("audit_log", logEntry)
 		log.Error(err)
 		return utils.Response(400, nil), err
 	}
 
 	logEntry.ActionStatus = "SUCCESS"
-	logConnection.InsertRow("auditlog", logEntry)
+	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(202, nil), nil
 }

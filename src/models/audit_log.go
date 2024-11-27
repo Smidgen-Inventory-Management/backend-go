@@ -25,10 +25,11 @@
 
 package smidgen
 
+import "time"
+
 type AuditLog struct {
-	LogID        int `json:"logID"`
-	Date         string `json:"date"`
-	Time         string `json:"time"`
-	ActionStatus string `json:"action_status"`
-	Action       string `json:"action"`
+	LogId           int       `json:"log_id"`
+	ActionTimestamp time.Time `json:"action_timestamp"`
+	ActionStatus    string    `json:"action_status"`
+	Action          string    `json:"action"`
 }

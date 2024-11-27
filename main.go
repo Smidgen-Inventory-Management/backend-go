@@ -79,17 +79,7 @@ func main() {
 	hostname := envConfig.Host + ":" + envConfig.Port
 	router := loadRoutes(envConfig)
 
-	go func() {
-		ticker := time.NewTicker(10 * time.Second)
-		defer ticker.Stop()
-
-		for {
-			select {
-			case <-ticker.C:
-				retryDatabaseConnection(utils.DatabaseConfigPath)
-			}
-		}
-	}()
+	checkDatabaseConnection(utils.DatabaseConfigPath)
 
 	log.Debug("Routes loaded.")
 	log.Infof("Server starting on %s", hostname)
@@ -105,7 +95,7 @@ func main() {
 	}
 }
 
-func retryDatabaseConnection(configPath string) {
+func checkDatabaseConnection(configPath string) {
 	const maxRetries = 3
 	for attempt := 1; attempt <= maxRetries; attempt++ {
 		if err := CheckDatabaseConnection(configPath); err != nil {
@@ -170,6 +160,7 @@ func loadRoutes(environmentConfig struct {
 	DefaultAPIService := service.NewDefaultAPIService()
 	BusinessUnitAPIService := service.NewBusinessUnitAPIService()
 	EquipmentAPIService := service.NewEquipmentAPIService()
+	ManufacturerAPIService := service.NewManufacturerAPIService()
 	EquipmentAssignmentAPIService := service.NewEquipmentAssignmentAPIService()
 	UserAPIService := service.NewUserAPIService()
 	AuditLogService := service.NewAuditLogAPIService()
@@ -178,12 +169,13 @@ func loadRoutes(environmentConfig struct {
 	DefaultAPIController := api.NewDefaultAPIController(DefaultAPIService)
 	BusinessUnitAPIController := api.NewBusinessUnitAPIController(BusinessUnitAPIService)
 	EquipmentAPIController := api.NewEquipmentAPIController(EquipmentAPIService)
+	ManufacturerAPIController := api.NewManufacturerAPIController(ManufacturerAPIService)
 	EquipmentAssignmentAPIController := api.NewEquipmentAssignmentAPIController(EquipmentAssignmentAPIService)
 	UserAPIController := api.NewUserAPIController(UserAPIService)
 	AuditLogAPIController := api.NewAuditLogAPIController(AuditLogService)
 	log.Debug("loaded API controllers")
 
-	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController, AuditLogAPIController)
+	router := utils.NewRouter(environmentConfig.RootPath, BusinessUnitAPIController, DefaultAPIController, EquipmentAPIController, EquipmentAssignmentAPIController, UserAPIController, AuditLogAPIController, ManufacturerAPIController)
 	log.Debug("successfully created routers")
 	return router
 }

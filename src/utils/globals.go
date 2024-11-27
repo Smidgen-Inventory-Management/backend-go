@@ -1,4 +1,4 @@
 package smidgen
 
-var ServerConfigPath = ""
-var DatabaseConfigPath = ""
+var ServerConfigPath = "../configs/server.yaml"
+var DatabaseConfigPath = "../configs/db_conn.yaml"

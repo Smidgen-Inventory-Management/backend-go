@@ -33,7 +33,8 @@ import (
 	"github.com/lib/pq"
 )
 
-func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]interface{}, error) {
+// GetRows returns all of the rows for the provided tableName as type of destInterface
+func (dao *DatabaseConnection) GetRows(tableName string, destInterface interface{}) ([]interface{}, error) {
 	_, err := validateTableName(dao, tableName)
 	if err != nil {
 		return nil, err
@@ -47,7 +48,7 @@ func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]in
 	}
 	defer rows.Close()
 
-	elementType := reflect.TypeOf(dest).Elem()
+	elementType := reflect.TypeOf(destInterface).Elem()
 
 	destValues := make([]interface{}, 0)
 	for i := 0; i < elementType.NumField(); i++ {
@@ -76,7 +77,9 @@ func (dao *DatabaseConnection) GetRows(tableName string, dest interface{}) ([]in
 	return results, nil
 }
 
-func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32, dest interface{}) (interface{}, error) {
+// GetById will return a single row from tableName by using the idName column, and the id filter.
+// The return type is of type destInterface.
+func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32, destInterface interface{}) (interface{}, error) {
 	_, err := validateTableName(dao, tableName)
 	if err != nil {
 		return nil, err
@@ -91,7 +94,7 @@ func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32
 	}
 	defer rows.Close()
 
-	objectType := reflect.TypeOf(dest).Elem()
+	objectType := reflect.TypeOf(destInterface).Elem()
 
 	destValues := make([]interface{}, 0)
 	for i := 0; i < objectType.NumField(); i++ {
@@ -119,15 +122,15 @@ func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32
 	return result.Interface(), nil
 }
 
+// InsertRow will execute an INSERT query onto tableName with values.
 func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) error {
 	_, err := validateTableName(dao, tableName)
 	if err != nil {
 		return err
 	}
 
-	v := reflect.ValueOf(values)
-	primaryID := v.Type().Field(0).Name
-
+	valuesToInsert := reflect.ValueOf(values)
+	idColumnName := CamelToSnake(valuesToInsert.Type().Field(0).Name)
 	tx, err := dao.db.Begin()
 	if err != nil {
 		return err
@@ -142,15 +145,15 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 	var columns []string
 	var placeholders []string
 
-	if err := tx.QueryRow("SELECT COALESCE(MAX(" + primaryID + "), 0) FROM smidgen." + tableName).Scan(&lastInsertedID); err != nil && err != sql.ErrNoRows {
+	if err := tx.QueryRow("SELECT COALESCE(MAX(" + idColumnName + "), 0) FROM smidgen." + tableName).Scan(&lastInsertedID); err != nil && err != sql.ErrNoRows {
 		return err
 	}
 
 	newID := lastInsertedID + 1
-	columns = append(columns, primaryID)
+	columns = append(columns, idColumnName)
 	placeholders = append(placeholders, "$1")
-	for i := 1; i < v.NumField(); i++ {
-		columns = append(columns, v.Type().Field(i).Name)
+	for i := 1; i < valuesToInsert.NumField(); i++ {
+		columns = append(columns, CamelToSnake(valuesToInsert.Type().Field(i).Name))
 		placeholders = append(placeholders, fmt.Sprintf("$%d", i+1))
 	}
 
@@ -161,17 +164,17 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 	}
 	defer stmt.Close()
 
-	fieldValues := make([]interface{}, v.NumField())
+	fieldValues := make([]interface{}, valuesToInsert.NumField())
 	fieldValues[0] = newID
-	for i := 1; i < v.NumField(); i++ {
-		fieldValues[i] = v.Field(i).Interface()
+	for i := 1; i < valuesToInsert.NumField(); i++ {
+		fieldValues[i] = valuesToInsert.Field(i).Interface()
 	}
 
 	_, err = stmt.Exec(fieldValues...)
 	if err != nil {
 		if pqErr, ok := err.(*pq.Error); ok {
 			if pqErr.Code == "23503" {
-				return fmt.Errorf("23503")
+				return fmt.Errorf("23503: FOREIGN KEY VIOLATION on %s", tableName)
 			}
 		}
 	}
@@ -180,6 +183,7 @@ func (dao *DatabaseConnection) InsertRow(tableName string, values interface{}) e
 	return tx.Commit()
 }
 
+// DeleteRow will execute a DELETE query onto tableName using the idLabel column with the matching id.
 func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id int32, args ...interface{}) error {
 
 	_, err := validateTableName(dao, tableName)
@@ -292,7 +296,7 @@ func validateTableName(dao *DatabaseConnection, tableName string) (bool, error) 
 	defer rows.Close()
 
 	validTableNames := make(map[string]bool)
-
+	
 	for rows.Next() {
 		var tableName string
 		if err := rows.Scan(&tableName); err != nil {

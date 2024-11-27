@@ -33,9 +33,6 @@ import (
 	"time"
 )
 
-// DefaultAPIService is a service that implements the logic for the DefaultAPIServicer
-// This service should implement the business logic for every endpoint for the DefaultAPI API.
-// Include any external packages or services that will be required by this service.
 type DefaultAPIService struct {
 }
 
@@ -45,12 +42,11 @@ type healthCheck struct {
 	Latency string `json:"latency"`
 }
 
-// NewDefaultAPIService creates a default api service
+
 func NewDefaultAPIService() api.DefaultAPIServicer {
 	return &DefaultAPIService{}
 }
 
-// HealthCheck - Check
 func (s *DefaultAPIService) HealthCheck(ctx context.Context) (utils.ImplResponse, error) {
 	log.Debug("checking status of core Smidgen services")
 	healthcheckStart := time.Now()
@@ -102,7 +98,6 @@ func (s *DefaultAPIService) HealthCheck(ctx context.Context) (utils.ImplResponse
 	return utils.Response(200, services), nil
 }
 
-// RootGet - Root
 func (s *DefaultAPIService) RootGet(ctx context.Context) (utils.ImplResponse, error) {
 	return utils.Response(403, nil), nil
 }

@@ -26,24 +26,31 @@
 package smidgen
 
 import (
-	"database/sql"
 	utils "smidgen-backend/src/utils"
 )
 
 type User struct {
-	UserId         int32          `json:"user_id"`
-	BusinessUnitId int32          `json:"business_unit_id"`
-	Username       string         `json:"username"`
-	Email          string         `json:"email"`
-	SaltedPassword sql.NullString `json:"-" swaggerignore:"true"`
+	UserId         int32  `json:"user_id"`
+	BusinessUnitId int32  `json:"business_unit_id"`
+	Username       string `json:"username"`
+	PasswordHash   string `json:"password_hash"`
+	PasswordSalt   string `json:"password_salt"`
+	FirstName      string `json:"first_name"`
+	LastName       string `json:"last_name"`
+	PrimaryEmail   string `json:"primary_email"`
 }
 
 // AssertUserRequired checks if the required fields are not zero-ed
 func AssertUserRequired(obj User) error {
 	elements := map[string]interface{}{
+		"user_id":          obj.UserId,
 		"business_unit_id": obj.BusinessUnitId,
 		"username":         obj.Username,
-		"email":            obj.Email,
+		"password_hash":    obj.PasswordHash,
+		"password_salt":    obj.PasswordSalt,
+		"first_name":       obj.FirstName,
+		"last_name":        obj.LastName,
+		"primary_email":    obj.PrimaryEmail,
 	}
 	for name, el := range elements {
 		if isZero := utils.IsZeroValue(el); isZero {

@@ -37,24 +37,21 @@ import (
 	"time"
 )
 
-var log = utils.Log()
-
-// UserAPIService is a service that implements the logic for the UserAPIServicer
-// This service should implement the business logic for every endpoint for the UserAPI API.
+// ManufacturerAPIService is a service that implements the logic for the ManufacturerAPIServicer
+// This service should implement the business logic for every endpoint for the ManufacturerAPI API.
 // Include any external packages or services that will be required by this service.
-type UserAPIService struct {
+type ManufacturerAPIService struct {
 }
 
-// NewUserAPIService creates a default api service
-func NewUserAPIService() api.UserAPIServicer {
-	return &UserAPIService{}
+// NewManufacturerAPIService creates a default api service
+func NewManufacturerAPIService() api.ManufacturerAPIServicer {
+	return &ManufacturerAPIService{}
 }
 
-// AddUser - Create user
-func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.ImplResponse, error) {
+// AddManufacturer - Create manufacturer
+func (s *ManufacturerAPIService) AddManufacturer(ctx context.Context, manufacturer models.Manufacturer) (utils.ImplResponse, error) {
 	privilege := "write"
 	var uuid16 [2]byte
-
 	_, err := rand.Read(uuid16[:])
 	if err != nil {
 		return utils.Response(500, nil), errors.New("an error has occurred while adding new data")
@@ -66,16 +63,16 @@ func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.I
 		LogId:           uuid,
 		ActionTimestamp: time.Now(),
 		ActionStatus:    "Failed",
-		Action:          "ADD_USER",
+		Action:          "ADD_MANUFACTURER",
 	}
-	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
+	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.InsertRow("users", user)
+	err = dbConnection.InsertRow("manufacturers", manufacturer)
 	if err != nil {
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Error(err)
@@ -87,8 +84,8 @@ func (s *UserAPIService) AddUser(ctx context.Context, user models.User) (utils.I
 	return utils.Response(202, nil), nil
 }
 
-// DeleteUser - Delete user
-func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.ImplResponse, error) {
+// DeleteManufacturer - Delete manufacturer
+func (s *ManufacturerAPIService) DeleteManufacturer(ctx context.Context, manufacturerId int32) (utils.ImplResponse, error) {
 	privilege := "delete"
 	var uuid16 [2]byte
 
@@ -103,7 +100,7 @@ func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.Im
 		LogId:           uuid,
 		ActionTimestamp: time.Now(),
 		ActionStatus:    "Failed",
-		Action:          "DELETE_USER",
+		Action:          "DELETE_MANUFACTURER",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
@@ -112,19 +109,20 @@ func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.Im
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.DeleteRow("users", "userid", userId)
+	err = dbConnection.DeleteRow("manufacturers", "ManufacturerID", manufacturerId)
 	if err != nil {
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Error: %v", err)
 		return utils.Response(404, nil), err
 	}
+
 	logEntry.ActionStatus = "SUCCESS"
 	logConnection.InsertRow("audit_log", logEntry)
 	return utils.Response(200, nil), nil
 }
 
-// GetUsers - Get Users
-func (s *UserAPIService) GetUsers(ctx context.Context) (utils.ImplResponse, error) {
+// GetManufacturers - Get manufacturers
+func (s *ManufacturerAPIService) GetManufacturers(ctx context.Context) (utils.ImplResponse, error) {
 	// Add api_user_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 	privilege := "read"
 	var uuid16 [2]byte
@@ -140,7 +138,7 @@ func (s *UserAPIService) GetUsers(ctx context.Context) (utils.ImplResponse, erro
 		LogId:           uuid,
 		ActionTimestamp: time.Now(),
 		ActionStatus:    "Failed",
-		Action:          "GET_USER",
+		Action:          "GET_MANUFACTURER",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
@@ -149,37 +147,35 @@ func (s *UserAPIService) GetUsers(ctx context.Context) (utils.ImplResponse, erro
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	var dest models.User
-	rows, err := dbConnection.GetRows("users", &dest)
-
+	var dest models.Manufacturer
+	rows, err := dbConnection.GetRows("manufacturers", &dest)
 	if err != nil {
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Error: %v", err)
 	}
-
 	if len(rows) == 0 {
 		logConnection.InsertRow("audit_log", logEntry)
-		return utils.Response(404, nil), fmt.Errorf("no users were found in the database")
+		return utils.Response(200, nil), fmt.Errorf("no manufacturer was found in the database")
 	}
-
-	var users []models.User
+	var Assets []models.Manufacturer
 	for _, row := range rows {
-		user, ok := row.(models.User)
+		manufacturer, ok := row.(models.Manufacturer)
 		if !ok {
 			logEntry.ActionStatus = "WARN"
 			logConnection.InsertRow("audit_log", logEntry)
 			log.Warn("Warn: Unexpected type in row")
 			continue
 		}
-		users = append(users, user)
+		Assets = append(Assets, manufacturer)
 	}
+
 	logEntry.ActionStatus = "SUCCESS"
 	logConnection.InsertRow("audit_log", logEntry)
-	return utils.Response(200, users), nil
+	return utils.Response(200, Assets), nil
 }
 
-// GetUserById - Get user
-func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.ImplResponse, error) {
+// GetManufacturerById - Get manufacturer
+func (s *ManufacturerAPIService) GetManufacturerById(ctx context.Context, manufacturerId int32) (utils.ImplResponse, error) {
 	privilege := "read"
 	var uuid16 [2]byte
 
@@ -194,7 +190,7 @@ func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.I
 		LogId:           uuid,
 		ActionTimestamp: time.Now(),
 		ActionStatus:    "Failed",
-		Action:          "GET_USER_BY_ID",
+		Action:          "GET_MANUFACTURER_BY_ID",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
@@ -202,16 +198,15 @@ func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.I
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
-
-	var dest models.User
-	row, err := dbConnection.GetByID("users", "userId", userId, &dest)
+	var dest models.Manufacturer
+	row, err := dbConnection.GetByID("manufacturers", "manufacturerId", manufacturerId, &dest)
 	if err != nil {
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
 	}
 
-	user, ok := row.(models.User)
+	manufacturer, ok := row.(models.Manufacturer)
 	if !ok {
 		logEntry.ActionStatus = "WARN"
 		logConnection.InsertRow("audit_log", logEntry)
@@ -221,11 +216,11 @@ func (s *UserAPIService) GetUserById(ctx context.Context, userId int32) (utils.I
 
 	logEntry.ActionStatus = "SUCCESS"
 	logConnection.InsertRow("audit_log", logEntry)
-	return utils.Response(200, user), nil
+	return utils.Response(200, manufacturer), nil
 }
 
-// UpdateUser - Update user
-func (s *UserAPIService) UpdateUser(ctx context.Context, userId int32, user models.User) (utils.ImplResponse, error) {
+// UpdateManufacturer - Update manufacturer
+func (s *ManufacturerAPIService) UpdateManufacturer(ctx context.Context, manufacturerId int32, manufacturer models.Manufacturer) (utils.ImplResponse, error) {
 	privilege := "write"
 	var uuid16 [2]byte
 
@@ -240,7 +235,7 @@ func (s *UserAPIService) UpdateUser(ctx context.Context, userId int32, user mode
 		LogId:           uuid,
 		ActionTimestamp: time.Now(),
 		ActionStatus:    "Failed",
-		Action:          "UPDATE_USER",
+		Action:          "UPDATE_MANUFACTURER",
 	}
 	logConnection, _ := utils.NewDatabaseConnection(utils.DatabaseConfigPath, "write")
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
@@ -248,7 +243,8 @@ func (s *UserAPIService) UpdateUser(ctx context.Context, userId int32, user mode
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
-	err = dbConnection.UpdateRow("users", "userid", userId, user)
+
+	err = dbConnection.UpdateRow("manufacturers", "manufacturerId", manufacturerId, manufacturer)
 	if err != nil {
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Error(err)

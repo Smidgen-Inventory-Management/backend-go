@@ -73,7 +73,7 @@ func (c *BusinessUnitAPIController) Routes() utils.Routes {
 			Pattern:     "business_unit",
 			HandlerFunc: c.AddBusinessUnit,
 		},
-		"DeletBusinessUnit": utils.Route{
+		"DeleteBusinessUnit": utils.Route{
 			Method:      strings.ToUpper("Delete"),
 			Pattern:     "business_unit/{unit_id}",
 			HandlerFunc: c.DeleteBusinessUnit,

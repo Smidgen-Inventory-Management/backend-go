@@ -48,14 +48,14 @@ func NewAuditLogAPIService() api.AuditLogAPIServicer {
 // GetAuditLogs - Get Audit Log
 func (s *AuditLogAPIService) GetAuditLogs(ctx context.Context) (utils.ImplResponse, error) {
 	privilege := "read"
-	
+
 	dbConnection, err := utils.NewDatabaseConnection(utils.DatabaseConfigPath, privilege)
 	if err != nil {
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
 	var dest models.AuditLog
-	rows, err := dbConnection.GetRows("AuditLog", &dest)
+	rows, err := dbConnection.GetRows("audit_log", &dest)
 
 	if err != nil {
 		log.Errorf("Error: %v", err)
@@ -88,7 +88,7 @@ func (s *AuditLogAPIService) GetAuditLogById(ctx context.Context, unitId int32) 
 	}
 
 	var dest models.AuditLog
-	row, err := dbConnection.GetByID("AuditLog", "logid", unitId, &dest)
+	row, err := dbConnection.GetByID("audit_log", "logid", unitId, &dest)
 	if err != nil {
 		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")
