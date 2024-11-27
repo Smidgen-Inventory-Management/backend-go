@@ -43,7 +43,6 @@ type User struct {
 // AssertUserRequired checks if the required fields are not zero-ed
 func AssertUserRequired(obj User) error {
 	elements := map[string]interface{}{
-		"user_id":          obj.UserId,
 		"business_unit_id": obj.BusinessUnitId,
 		"username":         obj.Username,
 		"password_hash":    obj.PasswordHash,

@@ -41,7 +41,6 @@ type Manufacturer struct {
 
 func AssertManufacturerRequired(obj Manufacturer) error {
 	elements := map[string]interface{}{
-		"manufacturer_id":  obj.ManufacturerId,
 		"name":             obj.Name,
 		"primary_service":  obj.PrimaryService,
 		"point_of_contact": obj.PointOfContact,

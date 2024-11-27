@@ -43,7 +43,6 @@ type Equipment struct {
 
 func AssertEquipmentRequired(obj Equipment) error {
 	elements := map[string]interface{}{
-		"equipment_id":     obj.EquipmentId,
 		"business_unit_id": obj.BusinessUnitId,
 		"manufacturer_id":  obj.ManufacturerId,
 		"model":            obj.Model,
