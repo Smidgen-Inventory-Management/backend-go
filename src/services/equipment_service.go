@@ -115,7 +115,7 @@ func (s *EquipmentAPIService) DeleteEquipment(ctx context.Context, equipmentId i
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.DeleteRow("equipment", "EquipmentID", equipmentId)
+	err = dbConnection.DeleteRow("equipment", "EquipmentId", equipmentId)
 	if err != nil {
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Error: %v", err)

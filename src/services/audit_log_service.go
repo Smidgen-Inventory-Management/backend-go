@@ -88,7 +88,7 @@ func (s *AuditLogAPIService) GetAuditLogById(ctx context.Context, unitId int32) 
 	}
 
 	var dest models.AuditLog
-	row, err := dbConnection.GetByID("audit_log", "logid", unitId, &dest)
+	row, err := dbConnection.GetByID("audit_log", "logId", unitId, &dest)
 	if err != nil {
 		log.Errorf("Data Not Found: %v", err)
 		return utils.Response(404, nil), fmt.Errorf("the requested ID was not found")

@@ -112,7 +112,7 @@ func (s *UserAPIService) DeleteUser(ctx context.Context, userId int32) (utils.Im
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
 
-	err = dbConnection.DeleteRow("users", "userid", userId)
+	err = dbConnection.DeleteRow("users", "userId", userId)
 	if err != nil {
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Error: %v", err)
@@ -248,7 +248,7 @@ func (s *UserAPIService) UpdateUser(ctx context.Context, userId int32, user mode
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Errorf("Failed to establish database connection as %s: %v", privilege, err)
 	}
-	err = dbConnection.UpdateRow("users", "userid", userId, user)
+	err = dbConnection.UpdateRow("users", "userId", userId, user)
 	if err != nil {
 		logConnection.InsertRow("audit_log", logEntry)
 		log.Error(err)

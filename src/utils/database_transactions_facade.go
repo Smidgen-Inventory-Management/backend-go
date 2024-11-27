@@ -85,8 +85,7 @@ func (dao *DatabaseConnection) GetByID(tableName string, idName string, id int32
 		return nil, err
 	}
 
-	query := fmt.Sprintf("SELECT * FROM smidgen.%s WHERE %s = ?;", tableName, idName)
-
+	query := fmt.Sprintf("SELECT * FROM smidgen.%s WHERE %s = $1;", tableName, CamelToSnake(idName))
 	rows, err := dao.db.Query(query, id)
 
 	if err != nil {
@@ -201,7 +200,7 @@ func (dao *DatabaseConnection) DeleteRow(tableName string, idLabel string, id in
 		}
 	}()
 
-	query := fmt.Sprintf("DELETE FROM smidgen.%s WHERE %s=$1;", tableName, idLabel)
+	query := fmt.Sprintf("DELETE FROM smidgen.%s WHERE %s=$1;", tableName, CamelToSnake(idLabel))
 
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -237,12 +236,12 @@ func (dao *DatabaseConnection) UpdateRow(tableName string, idLabel string, id in
 
 	var setValues []string
 	for i := 1; i < v.NumField(); i++ {
-		fieldName := objectType.Field(i).Name
+		fieldName := CamelToSnake(objectType.Field(i).Name)
 		setValues = append(setValues, fmt.Sprintf("%s=$%d", fieldName, i))
 	}
 
 	setClause := strings.Join(setValues, ", ")
-	query := fmt.Sprintf("UPDATE smidgen.%s SET %s WHERE %s=%v", tableName, setClause, idLabel, id)
+	query := fmt.Sprintf("UPDATE smidgen.%s SET %s WHERE %s=%v", tableName, setClause, CamelToSnake(idLabel), id)
 
 	tx, err := dao.db.Begin()
 	if err != nil {
@@ -296,7 +295,7 @@ func validateTableName(dao *DatabaseConnection, tableName string) (bool, error) 
 	defer rows.Close()
 
 	validTableNames := make(map[string]bool)
-	
+
 	for rows.Next() {
 		var tableName string
 		if err := rows.Scan(&tableName); err != nil {
