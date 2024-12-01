@@ -46,7 +46,7 @@ func AssertEquipmentRequired(obj Equipment) error {
 		"business_unit_id": obj.BusinessUnitId,
 		"manufacturer_id":  obj.ManufacturerId,
 		"model":            obj.Model,
-		"status":           obj.StatusId,
+		"status_id":           obj.StatusId,
 		"date_received":    obj.DateReceived,
 	}
 	for name, el := range elements {

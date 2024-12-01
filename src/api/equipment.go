@@ -203,11 +203,13 @@ func (c *EquipmentAPIController) UpdateEquipment(w http.ResponseWriter, r *http.
 	}
 	equipmentParam := models.Equipment{}
 	d := json.NewDecoder(r.Body)
+
 	d.DisallowUnknownFields()
 	if err := d.Decode(&equipmentParam); err != nil {
 		c.errorHandler(w, r, &utils.ParsingError{Err: err}, nil)
 		return
 	}
+
 	if err := models.AssertEquipmentRequired(equipmentParam); err != nil {
 		c.errorHandler(w, r, err, nil)
 		return

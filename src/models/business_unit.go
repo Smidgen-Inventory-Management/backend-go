@@ -31,7 +31,7 @@ import (
 )
 
 type BusinessUnit struct {
-	UnitId         int32  `json:"unit_id"`
+	BusinessUnitId int32  `json:"business_unit_id"`
 	Name           string `json:"name"`
 	PointOfContact string `json:"point_of_contact"`
 	AddressLineOne string `json:"address_line_one"`
